@@ -15,3 +15,6 @@ Este es el primer blog de una serie de post donde se analizará la estructura in
 El objetivo general de la serie de blogs es definir submercados industriales con parámetros formales y una metodología estadística clara y replicable. Para la realización del análisis se utilizó el lenguaje de programación R la versión 3.5.0, en el IDE de _R studio_, en la primera parte de éste análisis se utilizaron los siguientes paquetes de funciones; *easypackages*, *tidyverse*, *knitr*, *spatstat*, *sf*.
 
 
+
+
+
