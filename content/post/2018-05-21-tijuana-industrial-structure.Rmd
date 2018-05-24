@@ -12,8 +12,21 @@ header:
 
 Este es el primer blog de una serie de post donde se analizará la estructura industrial en la ciudad de Tijuana. 
 
-El objetivo general de la serie de blogs es definir submercados industriales con parámetros formales y una metodología estadística clara y replicable. Para la realización del análisis se utilizó el lenguaje de programación R la versión 3.5.0, en el IDE de _R studio_, en la primera parte de éste análisis se utilizaron los siguientes paquetes de funciones; *easypackages*, *tidyverse*, *knitr*, *spatstat*, *sf*.
+El objetivo general de la serie de blogs es definir submercados industriales con parámetros formales y una metodología estadística clara y replicable. Para la realización del análisis se utilizó el lenguaje de programación R la versión 3.5.0, en el IDE de _R studio_, en la primera parte de éste análisis se utilizaron los siguientes paquetes de funciones; _easypackages_, _tidyverse_, _knitr_, _spatstat_, _sf_, _readxl_, _lubridate_, _geosphere_, _scales_, _ggmap_ 
 
+
+Para realizar la identificación de los submercados industriales-manufactureros en Tijuana se utilizaron datos proporcionados por el INEGI, específicamente el DIRECTORIO NACIONAL DE UNIDADES ECONÓMICAS (DENUE) de donde se obtuvo la cantidad, ubicación y subsector al que pertenecen las empresas ubicadas en Tijuana. También se utilizaron los archivos en formato .shp para obtener los mapas por AGEB urbana de Tijuana.
+
+El trabajo de análisis se inicia llamando los paquetes de funciones
+
+
+```{r message=FALSE}
+library(easypackages)
+my_packages <- c("tidyverse", "readxl", "lubridate", "geosphere", "scales", "sf", "ggmap")
+libraries(my_packages)
+
+
+```
 
 
 

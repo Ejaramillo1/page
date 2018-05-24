@@ -13,7 +13,7 @@ Para realizar la limpieza de los datos se utilizó el lenguaje de programación 
 
 Comenzamos con llamar a los paquetes de funciones para que puedan ser utilizados. 
 
-```{r warning=FALSE}
+```{r warning=FALSE, echo=FALSE}
 
 library(easypackages)
 my_packages <- c("tidyverse", "readxl", "lubridate", "geosphere", "scales", "sf", "ggmap")
