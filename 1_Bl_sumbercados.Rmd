@@ -1,0 +1,127 @@
+---
+title: "Submercados industriales en Tijuana."
+output:
+  html_document:
+    df_print: paged
+---
+
+Este blog se busca identificar los principales submercados industriales-manufactureros en la ciudad de Tijuana. Para realizar este ejercicio se utilizarán diferentes bases de datos proporcionadas por el INEGI. 
+
+Primero el DIRECTORIO NACIONAL DE UNIDADES ECONÓMICAS (DENUE) de donde se obtendrán la cantidad, ubicación y subsector al que pertenecen las empresas manufactureras ubicadas en Tijuana. Posteriormente datos del CENSO 2010 y sus resultados por AGEB urbana, también se utilizarán los archivos en formato .shp para obtener el mapa por AGEB urbana.
+
+Para realizar la limpieza de los datos se utilizó el lenguaje de programación R y los siguientes paquetes de funciones _tidyverse_, _readxl_, _lubridate_, _geosphere_, _scales_, _sf_, _easypackages_, _ggmap_. Cada uno de estos paquetes de funciones se utilizó con fines diferentes. 
+
+Comenzamos con llamar a los paquetes de funciones para que puedan ser utilizados. 
+
+```{r warning=FALSE}
+
+library(easypackages)
+my_packages <- c("tidyverse", "readxl", "lubridate", "geosphere", "scales", "sf", "ggmap")
+libraries(my_packages)
+
+```
+
+
+Posteriormente vamos a llamar a la base de datos de DENUE previamente descargada en un archivo CSV y que se guardo de manera local. 
+
+```{r warning=FALSE}
+
+dbdenue <- read_csv("denue_inegi_02_.csv")
+
+
+```
+
+luego vamos a observar la estructura de la base de datos que acabamos de obtener
+
+```{r warning=FALSE}
+summary(dbdenue)
+
+```
+
+la principal caracteristica de esta tabla de datos es que contiene los registros para casi todas las empresas en Baja California clasificadas con diferentes variables. Es una tabla medianamente larga con 118mil observaciones aproximadamente y 41 variables. En este caso nuestro objeto de estudio es la ciudad de Tijuana, por lo que tenemos que realizar trabajo de limpieza de los datos antes de comenzar con el analisis.
+
+
+```{r warning=FALSE}
+
+dnue <- dbdenue %>%
+  dplyr::select(latitud, longitud,
+                cve_loc, municipio,
+                id, nom_estab, raz_social,
+                codigo_act, nombre_act, 
+                per_ocu, tipo_vial, tipo_asent,
+                nomb_asent, tipoCenCom, localidad,
+                ageb, manzana, fecha_alta) %>%
+  separate(fecha_alta, into = c("mes_alta", "year_alta"), sep = "\\s") %>%
+  mutate(latitud = as.numeric(latitud), 
+         longitud = as.numeric(longitud),
+         day = 01,
+         fecha = ymd(as_date(paste0(year_alta, mes_alta, day))),
+         codigo_industria = factor(str_sub(codigo_act,1,2))) %>%
+  filter(municipio %in% c("Tijuana") & codigo_industria %in% c("31", "32", "33") & per_ocu %in% c("51 a 100 personas", "101 a 250 personas", "251 y más personas")) %>%
+  rename_all(funs(str_to_lower(.))) %>%
+  mutate(LATITUD = latitud, 
+         LONGITUD = longitud) %>%
+  rename("y" = LATITUD,
+         "x" = LONGITUD,
+         "CVE_AGEB" = "ageb") %>%
+  select(x,y,CVE_AGEB, per_ocu) %>%
+  droplevels()
+
+
+ggplot(data = dnue) +
+  geom_point(aes(x = x, y = y))
+
+```
+
+En esta gráfica podemos observar un mapa de Tijuana (aunque no se alcance a notar) y las aglomeraciones que presentan las empresas manufactureras. 
+
+Para poder observar de mejor manera ddonde se encuentran las principales aglomeraciones industriales en Tijuana vamos a utilizar un mapa. Primero vamos a convertir los datos del DENUE a espaciales. 
+
+
+```{r warning=FALSE}
+
+spat_denue <- st_as_sf(dnue, coords = c("x", "y"), crs = "+proj=longlat +ellps=WGS84 +datum=WGS84") %>%
+  st_transform(crs = 4326)
+
+
+ggplot(spat_denue) + 
+  geom_sf()
+
+
+
+```
+
+
+Podemos observar que, agregando metadata a la base de datos se puede apreciar un poco mas la imagen de un mapa. Ahora para tener una referencia mas clara de donde estan ubicadas las empresas manufactureras en Tijuana. 
+
+
+
+```{r warning=FALSE}
+tj <- c(lon=-116.944333,
+        lat=32.491566)
+
+tjmap <- get_map(tj, zoom = 11, maptype = c("roadmap"))
+
+ggmap(tjmap) + 
+  geom_sf(data = spat_denue, inherit.aes = FALSE)
+
+```
+
+Ahora si podemos identificar mas claramente las agrupaciones industriales. Se pueden identificar por lo tanto que las principales agrupaciones se encuentran en la zona del PARQUE INDUSTRIAL PACIFICO, OTAY INDUSTRIAL, VIA RAPIDA, LA ZONA ESTE Y EL FLORIDO. Este analisis sin embargo no es suficiente para poder identificar los principales submercados. 
+
+Una de las variables que identificamos como relevantes identificar las principales aglomeraciones industriales en Tijuana es el numero de empleados.    
+
+
+```{r warning=FALSE}
+
+ggmap(tjmap) + 
+  geom_sf(data = spat_denue, inherit.aes = FALSE, aes(colour = per_ocu))
+
+```
+
+Los colores diferentes representan el numero de empleados que tienen las empresas manufactureras que estan ubicadas en tal o cual lugar. 
+
+
+
+
+
