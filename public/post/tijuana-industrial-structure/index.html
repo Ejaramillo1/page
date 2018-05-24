@@ -13,10 +13,15 @@
   
   
   
-  <meta name="description" content="Market / Industry / Research / Analysis">
+    
+      
+    
+  
+  <meta name="description" content="Este es el primer blog de una serie de post donde se analizará la estructura industrial en la ciudad de Tijuana.
+El objetivo general de la serie de blogs es definir submercados industriales con parámetros formales y una metodología estadística clara y replicable. Para la realización del análisis se utilizó el lenguaje de programación R la versión 3.5.0, en el IDE de R studio, en la primera parte de éste análisis se utilizaron los siguientes paquetes de funciones; easypackages, tidyverse, knitr, spatstat, sf.">
 
   
-  <link rel="alternate" hreflang="en-us" href="/talk/">
+  <link rel="alternate" hreflang="en-us" href="/post/tijuana-industrial-structure/">
 
   
 
@@ -32,6 +37,13 @@
   
     
   
+  
+    
+    
+      
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+      
+    
   
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
@@ -50,15 +62,15 @@
   
 
   
-  <link rel="alternate" href="/talk/index.xml" type="application/rss+xml" title="Standing on the shoulders of gigants">
-  <link rel="feed" href="/talk/index.xml" type="application/rss+xml" title="Standing on the shoulders of gigants">
+  <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Standing on the shoulders of gigants">
+  <link rel="feed" href="/index.xml" type="application/rss+xml" title="Standing on the shoulders of gigants">
   
 
   <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
 
-  <link rel="canonical" href="/talk/">
+  <link rel="canonical" href="/post/tijuana-industrial-structure/">
 
   <meta property="twitter:card" content="summary_large_image">
   
@@ -66,18 +78,21 @@
   <meta property="twitter:creator" content="@lalo8874">
   
   <meta property="og:site_name" content="Standing on the shoulders of gigants">
-  <meta property="og:url" content="/talk/">
-  <meta property="og:title" content="Recent &amp; Upcoming Talks | Standing on the shoulders of gigants">
-  <meta property="og:description" content="Market / Industry / Research / Analysis">
+  <meta property="og:url" content="/post/tijuana-industrial-structure/">
+  <meta property="og:title" content="Tijuana industrial structure | Standing on the shoulders of gigants">
+  <meta property="og:description" content="Este es el primer blog de una serie de post donde se analizará la estructura industrial en la ciudad de Tijuana.
+El objetivo general de la serie de blogs es definir submercados industriales con parámetros formales y una metodología estadística clara y replicable. Para la realización del análisis se utilizó el lenguaje de programación R la versión 3.5.0, en el IDE de R studio, en la primera parte de éste análisis se utilizaron los siguientes paquetes de funciones; easypackages, tidyverse, knitr, spatstat, sf.">
   <meta property="og:locale" content="en-us">
   
-  <meta property="og:updated_time" content="2017-01-01T00:00:00-08:00">
+  <meta property="article:published_time" content="2018-05-21T00:00:00&#43;00:00">
+  
+  <meta property="article:modified_time" content="2018-05-21T00:00:00&#43;00:00">
   
 
   
   
 
-  <title>Recent &amp; Upcoming Talks | Standing on the shoulders of gigants</title>
+  <title>Tijuana industrial structure | Standing on the shoulders of gigants</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#toc" data-offset="71" >
@@ -211,22 +226,113 @@
 </nav>
 
 
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
 
 
+  <div class="article-container">
+    <h1 itemprop="name">Tijuana industrial structure</h1>
 
-<div class="container">
-  <div class="row">
-    <div class="col-md-12">
-      <h1>Recent &amp; Upcoming Talks</h1>
+    
 
-      
+<div class="article-metadata">
 
-      
+  <span class="article-date">
+    
+    <time datetime="2018-05-21 00:00:00 &#43;0000 UTC" itemprop="datePublished dateModified">
+      May 21, 2018
+    </time>
+  </span>
+  <span itemscope itemprop="author publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="J. Eduardo Jaramillo Barrera">
+  </span>
 
-    </div>
-  </div>
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    1 min read
+  </span>
+  
+
+  
+  
+
+  
+  
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Tijuana%20industrial%20structure&amp;url=%2fpost%2ftijuana-industrial-structure%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=%2fpost%2ftijuana-industrial-structure%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%2fpost%2ftijuana-industrial-structure%2f&amp;title=Tijuana%20industrial%20structure"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=%2fpost%2ftijuana-industrial-structure%2f&amp;title=Tijuana%20industrial%20structure"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Tijuana%20industrial%20structure&amp;body=%2fpost%2ftijuana-industrial-structure%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
 
 </div>
+
+
+    <div class="article-style" itemprop="articleBody">
+      <p>Este es el primer blog de una serie de post donde se analizará la estructura industrial en la ciudad de Tijuana.</p>
+<p>El objetivo general de la serie de blogs es definir submercados industriales con parámetros formales y una metodología estadística clara y replicable. Para la realización del análisis se utilizó el lenguaje de programación R la versión 3.5.0, en el IDE de <em>R studio</em>, en la primera parte de éste análisis se utilizaron los siguientes paquetes de funciones; <em>easypackages</em>, <em>tidyverse</em>, <em>knitr</em>, <em>spatstat</em>, <em>sf</em>.</p>
+
+    </div>
+
+    
+
+
+
+
+
+    
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
 <footer class="site-footer">
   <div class="container">
     <p class="powered-by">
@@ -292,6 +398,17 @@
     
 
     
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
     
 
     

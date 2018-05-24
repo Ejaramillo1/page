@@ -12,5 +12,15 @@
 	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
     
+    <item>
+      <title>Tijuana industrial structure</title>
+      <link>/post/tijuana-industrial-structure/</link>
+      <pubDate>Mon, 21 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/tijuana-industrial-structure/</guid>
+      <description>Este es el primer blog de una serie de post donde se analizará la estructura industrial en la ciudad de Tijuana.
+El objetivo general de la serie de blogs es definir submercados industriales con parámetros formales y una metodología estadística clara y replicable. Para la realización del análisis se utilizó el lenguaje de programación R la versión 3.5.0, en el IDE de R studio, en la primera parte de éste análisis se utilizaron los siguientes paquetes de funciones; easypackages, tidyverse, knitr, spatstat, sf.</description>
+    </item>
+    
   </channel>
 </rss>
