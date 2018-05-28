@@ -44,6 +44,47 @@ db <- read_csv(file = "denue_inegi_02_.csv", guess_max = 10000)
 ```
 
 
+```{r}
+
+summary(db)
+
+
+
+
+```
+
+
+Podemos observar que la base base de datos del DENUE contiene una gran cantidad de variables 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
