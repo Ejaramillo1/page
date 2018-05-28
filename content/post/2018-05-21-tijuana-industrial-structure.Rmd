@@ -21,12 +21,29 @@ El trabajo de análisis se inicia llamando los paquetes de funciones
 
 
 ```{r message=FALSE}
+
 library(easypackages)
-my_packages <- c("tidyverse", "readxl", "lubridate", "geosphere", "scales", "sf", "ggmap")
+my_packages <- c("tidyverse", "knitr", "sf")
 libraries(my_packages)
 
 
 ```
+
+# Descripción de la base de datos
+
+Según la página web de INEGI el DENUE o (Directorio Nacional de Unidades Económicas) ofrece datos de identificación, ubicación, actividad económica, y tamaño de los negocios activos en el territorio nacional. 
+
+_En la última edición el DENUE publicó datos de identificación, ubicación y contacto de 5 millones 78 mil 728 establecimiento_. A nivel nacional
+
+```{r message=FALSE}
+
+db <- read_csv(file = "denue_inegi_02_.csv", guess_max = 10000)
+
+
+
+```
+
+
 
 
 
