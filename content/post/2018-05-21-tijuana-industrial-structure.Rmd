@@ -23,7 +23,7 @@ El trabajo de análisis se inicia llamando los paquetes de funciones
 ```{r message=FALSE}
 
 library(easypackages)
-my_packages <- c("tidyverse", "knitr", "sf")
+my_packages <- c("tidyverse", "readxl", "lubridate", "geosphere", "scales", "sf", "ggmap")
 libraries(my_packages)
 
 
@@ -43,19 +43,102 @@ db <- read_csv(file = "denue_inegi_02_.csv", guess_max = 10000)
 
 ```
 
-
-```{r}
-
-summary(db)
+Podemos observar que la base base de datos del DENUE contiene una gran cantidad de variables y registros, sin embargo para nuestro ejercicio solo necesitamos variables básicas de latitud, longitud, la clasificación SCIAN, y el número de identificación. Sin embargo para trabajar correctamente con la base de datos tenemos que realizar la limpieza de la tabla de datos. 
 
 
+```{r message=FALSE}
 
+denue_sf <- db %>%
+  dplyr::select(latitud, longitud, municipio, id, codigo_act, per_ocu, ageb, manzana, fecha_alta) %>%
+  mutate(latitud = as.numeric(latitud),
+         longitud = as.numeric(longitud),
+         codigo_industria = factor(str_sub(codigo_act, 1, 2))) %>%
+  filter(municipio %in% c("Tijuana") & 
+           codigo_industria %in% c("31", "32", "33") &
+           per_ocu %in% c("51 a 100 personas", "101 a 250 personas", "251 y más personas")) %>%
+  rename_all(funs(str_to_lower(.))) %>%
+  rename(y = latitud,
+         x = longitud,
+         CVE_AGEB = "ageb") %>%
+  select(x,y, CVE_AGEB) %>%
+  droplevels()
+  
+
+```
+
+Lo que hemos hecho con este procedimiento es limpiar la base de datos para enfocarnos en el tipo de empresas que más nos interesan. 
+
+Primero seleccionamos las variables de interés, posteriormente convertimos latitud y longitud a numérico, separamos la variable código de actividad para obtener los primeros dos dígitos que representan las tres ramas de la industria manufacturera, filtramos la base por municipio y por el número de personas que ocupa la unidad económica, en nuestro caso seleccionamos empresas con más de 31 empleados. Para efectos de homogeneidad convertimos todas las variables de tipo caracter a letras minúsculas, cambiamos el nombre de latitud y longitud a equis y ye, y seleccionamos la clave de AGEB. 
+
+
+```{r message=FALSE}
+
+summary(denue_sf)
 
 ```
 
 
-Podemos observar que la base base de datos del DENUE contiene una gran cantidad de variables 
 
+Si le damos una mirada rápida a los datos observamos que tenemos 652 puntos o unidades económicas, no tenemos variables perdidas respecto a la latitud y longitud. Sin embargo podemos observar que tenemos 515 claves de AGEB duplicadas, es decir tenemos aproximadamente agrupadas las empresas en 137 AGEB diferentes. 
+
+```{r message=FALSE}
+
+dim(denue_sf[duplicated(denue_sf$CVE_AGEB),])[1]
+
+```
+
+
+Vamos a convertir ahora los datos que limpiamos previamente a datos de tipo espacial proyectados con el sistema de referencia de coordenadas CRS = 4362 para poder superponer los datos en un mapa de google maps. 
+
+
+```{r message=FALSE}
+
+denue_sf <- st_as_sf(denue_sf, coords = c("x", "y"), crs = "+proj=longlat +ellps=WGS84 +datum=WGS84")
+
+
+```
+
+Ahora ya tenemos los datos de tipo espacial y los podemos superponer en un mapa de google maps. 
+
+
+```{r message=FALSE}
+library(ggmap)
+
+tj_location <- c(lon = -116.944333,
+                 lat = 32.491566)
+
+tj_map <- get_map(tj_location, zoom = 11, maptype = c("roadmap"))
+
+ggmap(tj_map) +
+  geom_sf(data = denue_sf, inherit.aes = FALSE)
+
+```
+En el mapa anterior podemos observar que las empresas manufacureras en Tijuana no se encuentran distribuidas de manera uniforme en la ciudad de Tijuana. Ahora vamos a formar clusters de acuerdo con un algoritmo de agrupación que tomará la distancia geográfica como variable para formar las agrupaciones de empresas. 
+
+
+```{r message=FALSE}
+# Calcula la matriz de distancias
+mdist <- st_distance(denue_sf)
+
+# Establece los parametros del algoritmo de clusters
+
+hc <- hclust(as.dist(mdist), method = "complete")
+
+# Distancia geografica maxima que toma el algoritmo
+
+d = 9000
+
+# Agrega la columna de clusters a los datos
+
+denue_sf$clust <- cutree(hc, h = d)
+
+ggmap(tj_map) +
+  geom_sf(data = denue_sf, inherit.aes = FALSE, aes(colour = factor(clust)))
+```
+
+Finalmente observamos que según el algoritmo de clasificación, tomando como indicador la distancia geográfica se forman aproximadamente 11 clusteres industriales en Tijuana. Se pueden reconocer las zonas del Parque industrial pacífico al suroeste, la zona industrial de la garita de otay, via rápida y via rapida alamar, playas de Tijuana, el florido  y el boulevard 2000. 
+
+El objetivo de este ejercicio se ha cumplido, sin embargo, se nota que se puede mejorar la agrupación mediante una exploración más profunda de los datos e incluyendo covariables. 
 
 
 

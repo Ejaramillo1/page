@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="theme" content="hugo-academic">
-  <meta name="generator" content="Hugo 0.39" />
+  <meta name="generator" content="Hugo 0.37.1" />
   <meta name="author" content="J. Eduardo Jaramillo Barrera">
 
   
@@ -251,7 +251,7 @@ El objetivo general de la serie de blogs es definir submercados industriales con
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    1 min read
+    5 min read
   </span>
   
 
@@ -316,10 +316,75 @@ El objetivo general de la serie de blogs es definir submercados industriales con
 <p>Para realizar la identificación de los submercados industriales-manufactureros en Tijuana se utilizaron datos proporcionados por el INEGI, específicamente el DIRECTORIO NACIONAL DE UNIDADES ECONÓMICAS (DENUE) de donde se obtuvo la cantidad, ubicación y subsector al que pertenecen las empresas ubicadas en Tijuana. También se utilizaron los archivos en formato .shp para obtener los mapas por AGEB urbana de Tijuana.</p>
 <p>El trabajo de análisis se inicia llamando los paquetes de funciones</p>
 <pre class="r"><code>library(easypackages)
-my_packages &lt;- c(&quot;tidyverse&quot;, &quot;knitr&quot;, &quot;sf&quot;)
+my_packages &lt;- c(&quot;tidyverse&quot;, &quot;readxl&quot;, &quot;lubridate&quot;, &quot;geosphere&quot;, &quot;scales&quot;, &quot;sf&quot;, &quot;ggmap&quot;)
 libraries(my_packages)</code></pre>
-<pre><code>## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-## logical.return = TRUE, : there is no package called &#39;sf&#39;</code></pre>
+<div id="descripcion-de-la-base-de-datos" class="section level1">
+<h1>Descripción de la base de datos</h1>
+<p>Según la página web de INEGI el DENUE o (Directorio Nacional de Unidades Económicas) ofrece datos de identificación, ubicación, actividad económica, y tamaño de los negocios activos en el territorio nacional.</p>
+<p><em>En la última edición el DENUE publicó datos de identificación, ubicación y contacto de 5 millones 78 mil 728 establecimiento</em>. A nivel nacional</p>
+<pre class="r"><code>db &lt;- read_csv(file = &quot;denue_inegi_02_.csv&quot;, guess_max = 10000)</code></pre>
+<p>Podemos observar que la base base de datos del DENUE contiene una gran cantidad de variables y registros, sin embargo para nuestro ejercicio solo necesitamos variables básicas de latitud, longitud, la clasificación SCIAN, y el número de identificación. Sin embargo para trabajar correctamente con la base de datos tenemos que realizar la limpieza de la tabla de datos.</p>
+<pre class="r"><code>denue_sf &lt;- db %&gt;%
+  dplyr::select(latitud, longitud, municipio, id, codigo_act, per_ocu, ageb, manzana, fecha_alta) %&gt;%
+  mutate(latitud = as.numeric(latitud),
+         longitud = as.numeric(longitud),
+         codigo_industria = factor(str_sub(codigo_act, 1, 2))) %&gt;%
+  filter(municipio %in% c(&quot;Tijuana&quot;) &amp; 
+           codigo_industria %in% c(&quot;31&quot;, &quot;32&quot;, &quot;33&quot;) &amp;
+           per_ocu %in% c(&quot;51 a 100 personas&quot;, &quot;101 a 250 personas&quot;, &quot;251 y más personas&quot;)) %&gt;%
+  rename_all(funs(str_to_lower(.))) %&gt;%
+  rename(y = latitud,
+         x = longitud,
+         CVE_AGEB = &quot;ageb&quot;) %&gt;%
+  select(x,y, CVE_AGEB) %&gt;%
+  droplevels()</code></pre>
+<p>Lo que hemos hecho con este procedimiento es limpiar la base de datos para enfocarnos en el tipo de empresas que más nos interesan.</p>
+<p>Primero seleccionamos las variables de interés, posteriormente convertimos latitud y longitud a numérico, separamos la variable código de actividad para obtener los primeros dos dígitos que representan las tres ramas de la industria manufacturera, filtramos la base por municipio y por el número de personas que ocupa la unidad económica, en nuestro caso seleccionamos empresas con más de 31 empleados. Para efectos de homogeneidad convertimos todas las variables de tipo caracter a letras minúsculas, cambiamos el nombre de latitud y longitud a equis y ye, y seleccionamos la clave de AGEB.</p>
+<pre class="r"><code>summary(denue_sf)</code></pre>
+<pre><code>##        x                y           CVE_AGEB        
+##  Min.   :-117.1   Min.   :32.42   Length:518        
+##  1st Qu.:-117.0   1st Qu.:32.47   Class :character  
+##  Median :-116.9   Median :32.49   Mode  :character  
+##  Mean   :-116.9   Mean   :32.49                     
+##  3rd Qu.:-116.9   3rd Qu.:32.53                     
+##  Max.   :-116.7   Max.   :32.55</code></pre>
+<p>Si le damos una mirada rápida a los datos observamos que tenemos 652 puntos o unidades económicas, no tenemos variables perdidas respecto a la latitud y longitud. Sin embargo podemos observar que tenemos 515 claves de AGEB duplicadas, es decir tenemos aproximadamente agrupadas las empresas en 137 AGEB diferentes.</p>
+<pre class="r"><code>dim(denue_sf[duplicated(denue_sf$CVE_AGEB),])[1]</code></pre>
+<pre><code>## [1] 406</code></pre>
+<p>Vamos a convertir ahora los datos que limpiamos previamente a datos de tipo espacial proyectados con el sistema de referencia de coordenadas CRS = 4362 para poder superponer los datos en un mapa de google maps.</p>
+<pre class="r"><code>denue_sf &lt;- st_as_sf(denue_sf, coords = c(&quot;x&quot;, &quot;y&quot;), crs = &quot;+proj=longlat +ellps=WGS84 +datum=WGS84&quot;)</code></pre>
+<p>Ahora ya tenemos los datos de tipo espacial y los podemos superponer en un mapa de google maps.</p>
+<pre class="r"><code>library(ggmap)
+
+tj_location &lt;- c(lon = -116.944333,
+                 lat = 32.491566)
+
+tj_map &lt;- get_map(tj_location, zoom = 11, maptype = c(&quot;roadmap&quot;))
+
+ggmap(tj_map) +
+  geom_sf(data = denue_sf, inherit.aes = FALSE)</code></pre>
+<p><img src="/post/2018-05-21-tijuana-industrial-structure_files/figure-html/unnamed-chunk-7-1.png" width="672" /> En el mapa anterior podemos observar que las empresas manufacureras en Tijuana no se encuentran distribuidas de manera uniforme en la ciudad de Tijuana. Ahora vamos a formar clusters de acuerdo con un algoritmo de agrupación que tomará la distancia geográfica como variable para formar las agrupaciones de empresas.</p>
+<pre class="r"><code># Calcula la matriz de distancias
+mdist &lt;- st_distance(denue_sf)
+
+# Establece los parametros del algoritmo de clusters
+
+hc &lt;- hclust(as.dist(mdist), method = &quot;complete&quot;)
+
+# Distancia geografica maxima que toma el algoritmo
+
+d = 9000
+
+# Agrega la columna de clusters a los datos
+
+denue_sf$clust &lt;- cutree(hc, h = d)
+
+ggmap(tj_map) +
+  geom_sf(data = denue_sf, inherit.aes = FALSE, aes(colour = factor(clust)))</code></pre>
+<p><img src="/post/2018-05-21-tijuana-industrial-structure_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Finalmente observamos que según el algoritmo de clasificación, tomando como indicador la distancia geográfica se forman aproximadamente 11 clusteres industriales en Tijuana. Se pueden reconocer las zonas del Parque industrial pacífico al suroeste, la zona industrial de la garita de otay, via rápida y via rapida alamar, playas de Tijuana, el florido y el boulevard 2000.</p>
+<p>El objetivo de este ejercicio se ha cumplido, sin embargo, se nota que se puede mejorar la agrupación mediante una exploración más profunda de los datos e incluyendo covariables.</p>
+</div>
 
     </div>
 
