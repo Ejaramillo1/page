@@ -6,9 +6,14 @@ libraries(my_packages)
 
 denue_data <- read_csv("content/post/denue_inegi_02_.csv", guess_max = 10000)
 
+scian <- read_excel("content/post/scian.xlsx") %>%
+  filter(!is.na(`Código`)) %>%
+  mutate(`codigo_industria` = factor(str_sub(`Código`,1,2))) %>%
+  filter(codigo_industria %in% c("31", "32", "33"))
+
 
 db <- denue_data %>%
-  select(latitud, longitud, municipio, id, codigo_act, per_ocu, ageb, manzana, fecha_alta) %>%
+  select(latitud, longitud, municipio, id, codigo_act, per_ocu, ageb, manzana, fecha_alta, nombre_act) %>%
   mutate(codigo_industria = factor(str_sub(codigo_act, 1,3))) %>%
   filter(municipio %in% c("Tijuana") & codigo_industria %in% c("311", "312", "313", 
                                                                "314", "315", "316", 
@@ -19,13 +24,65 @@ db <- denue_data %>%
                                                                "336", "337", "339")) %>%
   droplevels()
 
-  
 
-dat <- db %>%
-  mutate(per_ocu = as_factor(per_ocu)) %>%
-  group_by(codigo_industria, per_ocu) %>%
+
+
+
+dat <- db %>% 
+  group_by(nombre_act,codigo_act, per_ocu) %>%
   summarise(conteo = n()) %>%
-  arrange(desc(conteo))
+  arrange(desc(conteo)) %>%
+  ungroup()
+
+
+
+psych::describeBy(dat, group = dat$per_ocu)
+
+
+
+
+
+dat %>%
+  group_by(codigo_act) %>%
+  summarise(desv = sd(conteo)) %>%
+  arrange(desc(desv))
+
+
+
+
+
+
+# Cálculo del Rango
+
+range(dat$conteo)
+
+
+# Cálculo del Rango Interquartil
+
+quantile(dat$conteo)
+
+
+
+# Cálculo de la desviación estándar
+
+sd(dat$conteo)
+
+# Cálculo de la kurtosis
+
+psych::kurtosi(dat$conteo)
+
+
+# Cálculo de skewness
+
+psych::skew(dat$conteo)
+
+
+
+
+
+
+
+View(dat)
 
 distance <- dist(dat, method = "euclidean")
 
