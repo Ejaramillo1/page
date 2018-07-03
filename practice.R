@@ -157,3 +157,99 @@ db %>%
   summarise(n()) %>%
   ggplot(aes(x = per_ocu, y = `n()`)) + 
   geom_point()
+
+
+library(easypackages)
+my_packages <- c("rvest", "tidyverse")
+libraries(my_packages)
+
+url <- "https://www.bloomberg.com/billionaires/"
+
+
+posision <- read_html(url) %>%
+  html_nodes(".t-rank") %>%
+  html_text()
+
+
+nombre <- read_html(url) %>%
+  html_nodes(".t-name") %>%
+  html_text()
+
+
+net_worth <- read_html(url) %>%
+  html_nodes(".t-nw") %>%
+  html_text()
+
+
+last_change <- read_html(url) %>%
+  html_nodes(".t-lcd") %>%
+  html_text()
+
+YTD_change <- read_html(url) %>%
+  html_nodes(".t-ycd") %>%
+  html_text()
+
+
+country <- read_html(url) %>%
+  html_nodes(".t-country") %>%
+  html_text()
+
+industry <- read_html(url) %>%
+  html_nodes(".t-industry") %>%
+  html_text()
+
+
+
+df <- tibble::tibble(posision, nombre, country, industry, net_worth, last_change, YTD_change) [-1,] %>%
+  mutate(net_worth = as.numeric(str_extract(net_worth, pattern = "(\\d+\\.?\\d+)")),
+         last_change = as.numeric(str_extract(last_change, pattern = "(\\d+\\.?\\d?+)")),
+         YTD_change = as.numeric(str_extract(YTD_change, pattern = "(\\d+\\.?\\d?+)")))
+  
+
+
+library(rworldmap)
+
+# Country names that appear in the database
+
+
+
+unique_paises <- df %>%
+  distinct(country, .keep_all = FALSE)
+
+map_data <- joinCountryData2Map(df, joinCode = "NAME", nameJoinColumn = "country")
+
+
+View(df)
+
+
+nodos <- list(".t-rank", ".t-name", ".t-nw", ".t-lcd", ".t-ycd", ".t-country", ".t-industry")
+
+
+html_nodes(webpage,".t-rank")
+
+
+i <- html_nodes(webpage,c(".t-rank", ".t-industry"))
+
+
+
+
+tbl <- webpage %>%
+  html_nodes(".t-industry") %>%
+  html_text()
+
+head(tbl)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

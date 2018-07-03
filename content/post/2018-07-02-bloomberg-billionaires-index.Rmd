@@ -1,0 +1,14 @@
+---
+title: Bloomberg Billionaires Index
+author: J. Eduardo Jaramillo
+date: '2018-07-02'
+slug: bloomberg-billionaires-index
+categories: []
+tags:
+  - Statistics
+  - R
+header:
+  caption: ''
+  image: ''
+---
+
