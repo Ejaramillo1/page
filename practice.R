@@ -208,6 +208,8 @@ df <- tibble::tibble(posision, nombre, country, industry, net_worth, last_change
 
 
 library(rworldmap)
+library(sf)
+library(rgeos)
 
 # Country names that appear in the database
 
@@ -217,6 +219,9 @@ unique_paises <- df %>%
   distinct(country, .keep_all = FALSE)
 
 map_data <- joinCountryData2Map(df, joinCode = "NAME", nameJoinColumn = "country")
+
+
+
 
 
 View(df)
