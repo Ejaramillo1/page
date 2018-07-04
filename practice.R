@@ -241,11 +241,11 @@ world_data_map <- full_join(map, world_data, by = "SOVEREIGNT") %>%
   arrange(as.numeric(position)) %>%
   select(position, nombre, SOVEREIGNT, industry, net_worth, last_change, YTD_change, lat, lon)
 
+library(ggrepel)
 
 ggplot(world_data_map) + 
   geom_sf() + 
   geom_point(aes(lon, lat))
-
 
 
 library(ggmaps)
