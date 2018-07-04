@@ -159,14 +159,17 @@ db %>%
   geom_point()
 
 
+##################################################################################################################
+#################################################################################################################
+
 library(easypackages)
-my_packages <- c("rvest", "tidyverse")
+my_packages <- c("rvest", "tidyverse",  "rgeos", "sf")
 libraries(my_packages)
 
 url <- "https://www.bloomberg.com/billionaires/"
 
 
-posision <- read_html(url) %>%
+position <- read_html(url) %>%
   html_nodes(".t-rank") %>%
   html_text()
 
@@ -190,7 +193,7 @@ YTD_change <- read_html(url) %>%
   html_text()
 
 
-country <- read_html(url) %>%
+SOVEREIGNT <- read_html(url) %>%
   html_nodes(".t-country") %>%
   html_text()
 
@@ -200,19 +203,117 @@ industry <- read_html(url) %>%
 
 
 
-df <- tibble::tibble(posision, nombre, country, industry, net_worth, last_change, YTD_change) [-1,] %>%
+df <- tibble::tibble(position, nombre, SOVEREIGNT, industry, net_worth, last_change, YTD_change) [-1,] %>%
   mutate(net_worth = as.numeric(str_extract(net_worth, pattern = "(\\d+\\.?\\d+)")),
          last_change = as.numeric(str_extract(last_change, pattern = "(\\d+\\.?\\d?+)")),
-         YTD_change = as.numeric(str_extract(YTD_change, pattern = "(\\d+\\.?\\d?+)")))
+         YTD_change = as.numeric(str_extract(YTD_change, pattern = "(\\d+\\.?\\d?+)")),
+         SOVEREIGNT = fct_recode(SOVEREIGNT,
+                                 "United States of America" = "United States",
+                                 "Russia" = "Russian Federation"))
+
+
+countries <- df %>%
+  distinct(SOVEREIGNT) %>%
+  rename(.,  "Country" = SOVEREIGNT) %>%
+  mutate(Country = as.character(Country)) %>%
+  mutate_geocode(., `Country`)
+
+
+
+worldmap <- rnaturalearth::ne_download(scale = 110,
+type = "countries",
+category = "cultural",
+destdir = tempdir(),
+load = TRUE,
+returnclass = "sf")
+
+
+map <- worldmap %>% 
+  filter(TYPE %in% c("Sovereign country","Country"))
+
+
+world_data <- full_join(df, countries, by = c("SOVEREIGNT" = "Country" )) %>%
+  filter(!is.na(lat))
+
+
+
+world_data_map <- full_join(map, world_data, by = "SOVEREIGNT") %>%
+  arrange(as.numeric(position)) %>%
+  select(position, nombre, SOVEREIGNT, industry, net_worth, last_change, YTD_change, lat, lon)
+
+
+ggplot(world_data_map) + 
+  geom_sf() + 
+  geom_point(aes(lon, lat))
+
+
+
+library(ggmaps)
+
+dato <- df %>%
+  mutate(locs = geocode(location = SOVEREIGNT))
+
+
+
+pr <- left_join(df, worldmap, by = "SOVEREIGNT")
+
+
+
+mapa <- worldmap %>%
+  filter(TYPE %in% c("Sovereign country","Country")) %>%
+  select(SOVEREIGNT, SOV_A3) %>%
+  filter(distinct(SOVEREIGNT))
+
+
+
+
+df$SOVEREIGNT[!df$SOVEREIGNT %in% mapa$SOVEREIGNT]
+
+
+mapa_geometria <- worldmap %>%
+  filter(TYPE %in% c("Sovereign country", "Country")) %>%
+  left_join(df, by = "SOVEREIGNT")
+
+
+
+
+mapa_puntos <- worldmap %>%
+  filter(TYPE %in% c("Sovereign country", "Country")) %>%
+  fuzzyjoin::stringdist_left_join(df, by = "SOVEREIGNT") %>%
+  select(SOVEREIGNT.x, `geometry`, industry, net_worth, nombre, posision) %>%
+  st_centroid() %>%
+  mutate(x_coords = map_dbl(geometry, 1),
+         y_coords = map_dbl(geometry, 2),
+         position = as.numeric(posision)) %>%
+  arrange(position)
+
+
+
+
+
+
+
+
+library(ggrepel)
+
+
+ggplot(mapa_geometria) + 
+  geom_sf(mapa_geometria) + 
+  geom_sf(data = mapa_puntos, inherit.aes = FALSE, aes(size = ))
   
 
 
-library(rworldmap)
-library(sf)
-library(rgeos)
 
-# Country names that appear in the database
+mapa <- fuzzyjoin::stringdist_left_join(mapa,df, by = "SOVEREIGNT")
 
+
+ggplot(prueba) + 
+  geom_sf(aes(fill = SOVEREIGNT.x)) +
+  theme(legend.position = "none")
+
+
+
+df_map <- left_join(df, worldmap, join = "SOVEREIGNT")
 
 
 unique_paises <- df %>%
@@ -222,6 +323,10 @@ map_data <- joinCountryData2Map(df, joinCode = "NAME", nameJoinColumn = "country
 
 
 
+
+
+
+class(map_data)
 
 
 View(df)
