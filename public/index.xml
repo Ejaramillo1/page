@@ -37,7 +37,8 @@
 
 &lt;p&gt;En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG &lt;a href=&#34;https://www.bloomberg.com/billionaires/&#34; class=&#34;uri&#34;&gt;https://www.bloomberg.com/billionaires/&lt;/a&gt; para realizar un ejercicio de análisis nomás por cura.&lt;/p&gt;
 &lt;p&gt;Esta es una imagen donde se muestra la tabla original.&lt;/p&gt;
-&lt;p&gt;(bill_idx.JPG)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;knitr::include_graphics(&amp;quot;bill_idx.JPG&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;bill_idx.JPG&#34; width=&#34;950&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato pues los tenemos que contar uno por uno. Al ser sólo una tabla (-.-) &amp;lt;– &lt;em&gt;carita de weva&lt;/em&gt; no nos ofrece nada divertido para visualizar. Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo &lt;strong&gt;&lt;em&gt;SPOILER ALERT!!!&lt;/em&gt;&lt;/strong&gt; es &lt;strong&gt;ESTADOS UNIDOS&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en ésta ardua y dura tarea de copiar y pegar información de internet.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(easypackages)
@@ -543,7 +544,7 @@ destdir = tempdir(),
 load = TRUE,
 returnclass = &amp;quot;sf&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## OGR data source with driver: ESRI Shapefile 
-## Source: &amp;quot;C:\Users\pvelazquez\AppData\Local\Temp\RtmpyIGJ0r&amp;quot;, layer: &amp;quot;ne_110m_admin_0_countries&amp;quot;
+## Source: &amp;quot;C:\Users\pvelazquez\AppData\Local\Temp\RtmpEDMf0W&amp;quot;, layer: &amp;quot;ne_110m_admin_0_countries&amp;quot;
 ## with 177 features
 ## It has 94 fields
 ## Integer64 fields read as strings:  POP_EST NE_ID&lt;/code&gt;&lt;/pre&gt;
@@ -552,7 +553,7 @@ returnclass = &amp;quot;sf&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
   geom_point(data = countr_dat, aes(x = LONGITUDE, y = LATITUDE,  size = `NUMBER OF BILLIONAIRES`, colour = as.factor(`NUMBER OF BILLIONAIRES`), alpha = .5), inherit.aes = FALSE) +
   scale_size_continuous(range = c(2,9)) +
   theme(legend.position = &amp;quot;none&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2018-07-02-bloomberg-billionaires-index_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2018-07-02-bloomberg-billionaires-index_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;En este mapa mostramos de igual manera el número de billonarios por país. Las bolitas de colores representan la ubicación geográfica de los billonarios y el tamaño de la bolita representa la cantidad de billonarios por país. Por ahorita le vamos a dejar ahí. Si quieren más información, la pueden consultar en el link. &lt;a href=&#34;https://www.bloomberg.com/billionaires/&#34; class=&#34;uri&#34;&gt;https://www.bloomberg.com/billionaires/&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
