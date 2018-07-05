@@ -1,14 +1,210 @@
 ---
-title: Bloomberg Billionaires Index
-author: J. Eduardo Jaramillo
+title: "NOMAS POR CURA"
+author: "J. Eduardo Jaramillo"
 date: '2018-07-02'
-slug: bloomberg-billionaires-index
-categories: []
-tags:
-  - Statistics
-  - R
 header:
   caption: ''
   image: ''
+slug: bloomberg-billionaires-index
+tags:
+- Statistics
+- R
+- Fun
+categories: []
 ---
+
+En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG https://www.bloomberg.com/billionaires/ para realizar uno ejercicio de análisis nomás por cura.
+
+El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo posicionadas del 1ro al 500vo lugar. Sin embargo al ser sólo una tabla rasa no nos ofrece nada divertido para visualizar. Entonces, nosotros nomás por cura vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo **_SPOILER ALERT!!!_** es Estados Unidos. 
+
+Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en ésta ardua y dura tarea de copiar y pegar información de internet. 
+
+```{r message=FALSE, warning=FALSE}
+
+library(easypackages)
+my_packages <- c("rvest", "tidyverse", "rgeos", "sf", "ggmap", "mapview", "readr", "knitr", "ggrepel")
+libraries(my_packages)
+
+```
+
+
+Para conseguir los datos podríamos hacer un simple copy-paste de tooooooda la tabla y luego pegarla en excel pero la neta **QUE WEVA** además, cada vez que necesitemos traer los datos tenemos que hacer la misma operación osea **MAS QUE WEVA** por lo que haremos uso de la magia de las computadoras y el conocimiento milenario de los programadores que crearon el paquete de funciones **rvest** para traer la tabla columna por columna y luego las juntamos todas. Lo chido de esto es que la computadora se comunica con la página cada vez que se hace la operación entonces uno no tiene que hacer nada más que picarle el botoncito. 
+
+Comenzamos el archi-reconocido _**copy-paste**_ por indicar el **_url_** de donde jalaremos la información, luego guardamos en un vector de caracteres la info de la columna, le quitamos el primer registro por que no sirve, **_si sirve pero es el nombre de la columna_**
+```{r message=FALSE}
+
+url <- "https://www.bloomberg.com/billionaires/"
+
+position <- read_html(url) %>% #Aquí le dices a la compu de donde jalar la info
+  html_nodes(".t-rank") %>% #Aquí le dices a la compu que columna jalar
+  html_text() #Adivina que hace esto(La pone todo como texto y le quita un montón de carácteres que no sirven)
+
+position <- position[(-1)]
+
+nombre <- read_html(url) %>% #Lo mismo para otra columna
+  html_nodes(".t-name") %>% #Lo mismo para otra columna
+  html_text() #Lo mismo para otra columna
+
+nombre <- nombre[(-1)]
+
+net_worth <- read_html(url) %>% #Lo mismo para otra columna (todo pa abajo lo mismo)
+  html_nodes(".t-nw") %>%
+  html_text()
+
+net_worth <- net_worth[(-1)]
+
+last_change <- read_html(url) %>%
+  html_nodes(".t-lcd") %>%
+  html_text()
+
+
+last_change <- last_change[(-1)]
+
+
+YTD_change <- read_html(url) %>%
+  html_nodes(".t-ycd") %>%
+  html_text()
+
+YTD_change <- YTD_change[(-1)]
+
+
+SOVEREIGNT <- read_html(url) %>%
+  html_nodes(".t-country") %>%
+  html_text()
+
+SOVEREIGNT <- SOVEREIGNT[(-1)]
+
+industry <- read_html(url) %>%
+  html_nodes(".t-industry") %>%
+  html_text()
+
+industry <- industry[(-1)]
+
+```
+
+Ya que tenemos listos nuestros ingredientes muchachitos.......vamos a juntarlos todos por que así separados no rifan. Como las columnas que tienen numeritos vienen con carateres especiales de moneda, suma y otros tenemos que quitarlos. Esto por que si quieres sumar dos celdas con un carácter especial la compu no lo reconoce como número y pues........ te tira error. 
+
+Ah! también le cambio el nombre a Estados Unidos y Rusia, por que así me los enseñaron en la primaria.........
+
+```{r message=FALSE}
+df <- tibble::tibble(position, nombre, SOVEREIGNT, net_worth, last_change, YTD_change) %>%
+  mutate(net_worth = as.numeric(str_extract(net_worth, pattern = "(\\d+\\.?\\d+)")),
+         last_change = as.numeric(str_extract(last_change, pattern = "(\\d+\\.?\\d?+)")),
+         YTD_change = as.numeric(str_extract(YTD_change, pattern = "(\\d+\\.?\\d?+)")),
+         SOVEREIGNT = fct_recode(SOVEREIGNT,
+                                 "United States of America" = "United States",
+                                 "Russia" = "Russian Federation")) %>%
+  slice(-500)
+
+countries_locations <- read_csv("countries_locations.csv")
+```
+
+
+
+Ya teniendo nuestros ingredientes en la cazuela, los vamos a poner en la lumbre y le comenzamos a mover pa' que salga el olor y nos de hambre. Osea. 
+
+Vamos a trabajar con los datos para poderlos presentar.
+
+
+```{r message=FALSE}
+
+countr_dat <- df %>%
+  filter(!SOVEREIGNT %in% c("Gerorgia")) %>%
+  group_by(SOVEREIGNT) %>%
+  summarise(`NUMBER OF BILLIONAIRES` = n(),
+            `SUM OF NET WORTH BY COUNTRY` = sum(net_worth)) %>%
+  left_join(countries_locations, by = c("SOVEREIGNT" = "Country")) %>%
+  mutate(LATITUDE = lat,
+         LONGITUDE = lon) %>%
+  filter(!is.na(lat)) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) %>%
+  select(-`X1`) %>%
+  filter(!SOVEREIGNT %in% c("Georgia")) %>%
+  rename(., "COUNTRY" = "SOVEREIGNT")
+
+```
+
+Ora vamos a hacer un mapita interactivo _(acabo de aprender no me juzguen)_ en el mapita van a salir puntitos y luego, si le picas al puntito va a salir informacioncita bonita, no tan interesante pero, _el mapa se mueve!!!!!!!!!!_
+
+La información que sale son:.
+
+1. Número de billonarios
+2. Suma de todo el dinero que juntan los billonarios de cada país en dólares
+
+Latitud, longitud y una columna que pueden igorar....
+
+```{r message=FALSE}
+
+mapview(countr_dat, zcol = "COUNTRY")
+
+
+```
+
+
+Si ya se que sale una tablota estamos trabajando en eso may frends. 
+
+Bueno ya que tenemos un mapita bonito vamos a poner una tablita. En total son 47 países que figuran en la lista de los billonarios entonces vamos a hacer una tablita para ordernarlos de mayor a menor y ver que pedo con la vida. 
+
+En la tabla la columna **NO BILLONARIOS** quiere decir número de billonarios luego dicen que uno la acaga....
+
+```{r}
+
+df %>%
+  select(SOVEREIGNT) %>%
+  group_by(SOVEREIGNT) %>%
+  summarise(`NO BILLONARIOS` = n()) %>%
+  arrange(desc(`NO BILLONARIOS`)) %>%
+  kable()
+```
+
+Ahora podemos ver que **_Estados Unidos_**, **_China_**, **_Alemania_**, **_Rusia_** e **_India_** son los cinco primeros lugares.
+
+Igual las tablas dan weva, entonces por qué no ponemos la información en un mapa. Por cierto México está entre Taiwan y Malasia. 
+
+Para poner la información en un mapita chido tenemos que **_bajar un mapita chido_** unirlo con nuestros datos y luego **_si dios quiere_** como diría mi abuela mostramos la información.
+
+
+```{r}
+
+library(ggmap)
+
+worldmap <- rnaturalearth::ne_download(scale = 110,
+type = "countries",
+category = "cultural",
+destdir = tempdir(),
+load = TRUE,
+returnclass = "sf")
+
+
+ggplot(worldmap) +
+  geom_sf() +
+  geom_point(data = countr_dat, aes(x = LONGITUDE, y = LATITUDE,  size = `NUMBER OF BILLIONAIRES`, colour = as.factor(`NUMBER OF BILLIONAIRES`), alpha = .5), inherit.aes = FALSE) +
+  scale_size_continuous(range = c(2,9)) +
+  theme(legend.position = "none")
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

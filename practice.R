@@ -163,7 +163,7 @@ db %>%
 #################################################################################################################
 
 library(easypackages)
-my_packages <- c("rvest", "tidyverse",  "rgeos", "sf")
+my_packages <- c("rvest", "tidyverse",  "rgeos", "sf", "ggmap")
 libraries(my_packages)
 
 url <- "https://www.bloomberg.com/billionaires/"
@@ -173,50 +173,115 @@ position <- read_html(url) %>%
   html_nodes(".t-rank") %>%
   html_text()
 
+position <- position[(-1)]
 
 nombre <- read_html(url) %>%
   html_nodes(".t-name") %>%
   html_text()
 
+nombre <- nombre[(-1)]
 
 net_worth <- read_html(url) %>%
   html_nodes(".t-nw") %>%
   html_text()
 
+net_worth <- net_worth[(-1)]
 
 last_change <- read_html(url) %>%
   html_nodes(".t-lcd") %>%
   html_text()
 
+
+last_change <- last_change[(-1)]
+
+
 YTD_change <- read_html(url) %>%
   html_nodes(".t-ycd") %>%
   html_text()
+
+YTD_change <- YTD_change[(-1)]
 
 
 SOVEREIGNT <- read_html(url) %>%
   html_nodes(".t-country") %>%
   html_text()
 
+SOVEREIGNT <- SOVEREIGNT[(-1)]
+
 industry <- read_html(url) %>%
   html_nodes(".t-industry") %>%
   html_text()
 
+industry <- industry[(-1)]
 
 
-df <- tibble::tibble(position, nombre, SOVEREIGNT, industry, net_worth, last_change, YTD_change) [-1,] %>%
+df <- tibble::tibble(position, nombre, SOVEREIGNT, net_worth, last_change, YTD_change) %>%
   mutate(net_worth = as.numeric(str_extract(net_worth, pattern = "(\\d+\\.?\\d+)")),
          last_change = as.numeric(str_extract(last_change, pattern = "(\\d+\\.?\\d?+)")),
          YTD_change = as.numeric(str_extract(YTD_change, pattern = "(\\d+\\.?\\d?+)")),
          SOVEREIGNT = fct_recode(SOVEREIGNT,
                                  "United States of America" = "United States",
-                                 "Russia" = "Russian Federation"))
+                                 "Russia" = "Russian Federation")) %>%
+  slice(-500)
+
+######################################################################################
+######################################################################################
+countries <- df %>%                                                               ####
+  distinct(SOVEREIGNT) %>%                                                        ####
+  rename(.,  "Country" = SOVEREIGNT) %>%                                          ####
+  mutate(Country = as.character(Country)) %>%                                     #### 
+  mutate_geocode(., `Country`)                                                    ####
+                                                                                  ####
+write.csv(countries, "countries_locations.csv")                                   ####
+                                                                                  ####
+######################################################################################
+######################################################################################
+
+countr_dat <- df %>%
+  group_by(SOVEREIGNT) %>%
+  summarise(`NUMBER OF BILLIONAIRES` = n(),
+            `SUM OF NET WORTH BY COUNTRY` = sum(net_worth)) %>%
+  left_join(countries_locations, by = c("SOVEREIGNT" = "Country")) %>%
+  mutate(LATITUDE = lat,
+         LONGITUDE = lon) %>%
+  filter(!is.na(lat)) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) %>%
+  select(-`X1`) %>%
+  filter(!SOVEREIGNT %in% c("Georgia")) %>%
+  rename(., "COUNTRY" = "SOVEREIGNT")
 
 
-countries <- df %>%
-  distinct(SOVEREIGNT) %>%
-  rename(.,  "Country" = SOVEREIGNT) %>%
-  mutate(Country = as.character(Country)) %>%
-  mutate_geocode(., `Country`)
+library(mapview)
+
+mapview(countr_dat, map.types = c("OpenStreetMap.DE"), zcol = "COUNTRY", add = TRUE, cex = 9)
+
+countries_sf <- countries %>%
+  filter(!is.na(lat) & !Country %in% c("Georgia")) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) %>%
+  full_join(df_nested, by = c("Country" = "SOVEREIGNT"))
+
+library(mapview)
+
+
+mapview(countries_sf)
+
+
+
+
+
+
+
+
+library(leaflet)
+
+leaflet(data = countries) %>%
+  addTiles() %>%
+  addMarkers(~lon, ~lat)
+
+df_nested <- df %>%
+  group_by(SOVEREIGNT) %>%
+  nest()
+
 
 
 
@@ -241,11 +306,24 @@ world_data_map <- full_join(map, world_data, by = "SOVEREIGNT") %>%
   arrange(as.numeric(position)) %>%
   select(position, nombre, SOVEREIGNT, industry, net_worth, last_change, YTD_change, lat, lon)
 
+
+
+
+
+# Number of billionaires by country
+
+bbc <- world_data_map %>%
+  select(SOVEREIGNT, lat, lon) %>%
+  group_by(SOVEREIGNT, lat, lon) %>%
+  summarise(numero = n())
+
+
 library(ggrepel)
 
 ggplot(world_data_map) + 
-  geom_sf() + 
-  geom_point(aes(lon, lat))
+  geom_sf() +
+  geom_point(data = bbc, inherit.aes = TRUE, aes(x = lon, y = lat, size = numero, color = as.factor(numero))) +
+  geom_text_repel(data = bbc, inherit.aes = FALSE, aes(lon, y = lat, label = SOVEREIGNT))
 
 
 library(ggmaps)
