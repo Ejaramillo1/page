@@ -190,9 +190,6 @@ ggplot(worldmap) +
   geom_point(data = countr_dat, aes(x = LONGITUDE, y = LATITUDE,  size = `NUMBER OF BILLIONAIRES`, colour = as.factor(`NUMBER OF BILLIONAIRES`), alpha = .5), inherit.aes = FALSE) +
   scale_size_continuous(range = c(2,9)) +
   theme(legend.position = "none")
-
-
-
 ```
 
 En este mapa mostramos de igual manera el número de billonarios por país. Las bolitas de colores representan la ubicación geográfica de los billonarios y el tamaño de la bolita representa la cantidad de billonarios por país. Por ahorita le vamos a dejar ahí. Si quieren más información, la pueden consultar en el link. https://www.bloomberg.com/billionaires/ 
