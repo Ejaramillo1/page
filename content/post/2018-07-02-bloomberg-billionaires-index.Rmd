@@ -20,7 +20,7 @@ Esta es una imagen donde se muestra la tabla original.
 ![tabla](bill_idx.JPG)
 
 
-El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo posicionadas del primero al 500vo lugar. Sin embargo al ser sólo una tabla fea no nos ofrece nada divertido para visualizar. Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo **_SPOILER ALERT!!!_** es Estados Unidos, de hecho es la única pregunta que respondemos.
+El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo en total se contabilizan 500 personas. Sin embargo al ser sólo una tabla fea no nos ofrece nada divertido para visualizar. Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo **_SPOILER ALERT!!!_** es Estados Unidos, de hecho es la única pregunta que respondemos.
 
 Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en ésta ardua y dura tarea de copiar y pegar información de internet. 
 
