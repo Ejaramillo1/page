@@ -343,7 +343,7 @@ destdir = tempdir(),
 load = TRUE,
 returnclass = &amp;quot;sf&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## OGR data source with driver: ESRI Shapefile 
-## Source: &amp;quot;C:\Users\pvelazquez\AppData\Local\Temp\Rtmp63y7ot&amp;quot;, layer: &amp;quot;ne_110m_admin_0_countries&amp;quot;
+## Source: &amp;quot;C:\Users\pvelazquez\AppData\Local\Temp\Rtmpqcevjp&amp;quot;, layer: &amp;quot;ne_110m_admin_0_countries&amp;quot;
 ## with 177 features
 ## It has 94 fields
 ## Integer64 fields read as strings:  POP_EST NE_ID&lt;/code&gt;&lt;/pre&gt;
@@ -353,6 +353,7 @@ returnclass = &amp;quot;sf&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
   scale_size_continuous(range = c(2,9)) +
   theme(legend.position = &amp;quot;none&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/post/2018-07-02-bloomberg-billionaires-index_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;En este mapa mostramos de igual manera el número de billonarios por país. Las bolitas de colores representan la ubicación geográfica de los billonarios y el tamaño de la bolita representa la cantidad de billonarios por país. Por ahorita le vamos a dejar ahí. Si quieren más información, la pueden consultar en el link.&lt;/p&gt;
 </description>
     </item>
     
