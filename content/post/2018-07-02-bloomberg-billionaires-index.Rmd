@@ -20,7 +20,7 @@ Esta es una imagen donde se muestra la tabla original.
 ![tabla](bill_idx.JPG)
 
 
-El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo en total se contabilizan 500 personas. Sin embargo al ser sólo una tabla fea no nos ofrece nada divertido para visualizar. Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo **_SPOILER ALERT!!!_** es Estados Unidos, de hecho es la única pregunta que respondemos.
+El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato pues los tenemos que contar uno por uno. Al ser sólo una tabla (-.-) <-- _carita de weva_ no nos ofrece nada divertido para visualizar. Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo **_SPOILER ALERT!!!_** es **ESTADOS UNIDOS**.
 
 Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en ésta ardua y dura tarea de copiar y pegar información de internet. 
 
@@ -33,9 +33,12 @@ libraries(my_packages)
 ```
 
 
-Para conseguir los datos podríamos hacer un simple copy-paste de tooooooda la tabla y luego pegarla en excel pero la neta **QUE WEVA** además, cada vez que necesitemos traer los datos tenemos que hacer la misma operación osea **MAS QUE WEVA** por lo que haremos uso de la magia de las computadoras y el conocimiento milenario de los programadores que crearon el paquete de funciones **rvest** para traer la tabla columna por columna y luego las juntamos todas. Lo chido de esto es que la computadora se comunica con la página cada vez que se hace la operación entonces uno no tiene que hacer nada más que picarle el botoncito. 
+Para conseguir los datos, podríamos hacer un simple copy-paste de tooooooda la tabla y luego pegarla en excel pero la neta **QUE WEVA** además, cada vez que necesitemos traer los datos tenemos que hacer la misma operación (copiar y pegar los 500 registros a mano) osea **MAS QUE WEVA**.Por esto, haremos uso de la magia de las computadoras, el conocimiento milenario de los programadores que crearon el paquete de funciones **rvest**, y mucho internet para traer la tabla.
 
-Comenzamos el archi-reconocido _**copy-paste**_ por indicar el **_url_** de donde jalaremos la información, luego guardamos en un vector de caracteres la info de la columna, le quitamos el primer registro por que no sirve, **_si sirve pero es el nombre de la columna_**
+Lo chido de esto es que la computadora se comunica con la página web cada vez que se hace la operación entonces, uno sólo tiene que picar el botoncito para que se baje la info solita. 
+
+Comenzamos el archi-reconocido _**copy-paste**_ indicando el **_url_** de donde jalaremos la información luego, guardamos en un vector de caracteres la info de la columna. Y **TATAAAAAAAAAAAN** listo.
+
 ```{r message=FALSE}
 
 url <- "https://www.bloomberg.com/billionaires/"
@@ -98,8 +101,7 @@ df <- tibble::tibble(position, nombre, SOVEREIGNT, net_worth, last_change, YTD_c
          YTD_change = as.numeric(str_extract(YTD_change, pattern = "(\\d+\\.?\\d?+)")),
          SOVEREIGNT = fct_recode(SOVEREIGNT,
                                  "United States of America" = "United States",
-                                 "Russia" = "Russian Federation")) %>%
-  slice(-500)
+                                 "Russia" = "Russian Federation"))
 
 countries_locations <- read_csv("countries_locations.csv")
 ```
