@@ -31,8 +31,8 @@ categories: []
 <link href="/rmarkdown-libs/PopupTable/popup.css" rel="stylesheet" />
 
 
-<p>En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG <a href="https://www.bloomberg.com/billionaires/" class="uri">https://www.bloomberg.com/billionaires/</a> para realizar uno ejercicio de análisis nomás por cura.</p>
-<p>El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo posicionadas del 1ro al 500vo lugar. Sin embargo al ser sólo una tabla rasa no nos ofrece nada divertido para visualizar. Entonces, nosotros nomás por cura vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo <strong><em>SPOILER ALERT!!!</em></strong> es Estados Unidos.</p>
+<p>En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG <a href="https://www.bloomberg.com/billionaires/" class="uri">https://www.bloomberg.com/billionaires/</a> para realizar un ejercicio de análisis nomás por cura.</p>
+<p>El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo posicionadas del <span class="math inline">\(1^\)</span> al 500vo lugar. Sin embargo al ser sólo una tabla rasa no nos ofrece nada divertido para visualizar. Entonces, nosotros nomás por cura vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo <strong><em>SPOILER ALERT!!!</em></strong> es Estados Unidos.</p>
 <p>Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en ésta ardua y dura tarea de copiar y pegar información de internet.</p>
 <pre class="r"><code>library(easypackages)
 my_packages &lt;- c(&quot;rvest&quot;, &quot;tidyverse&quot;, &quot;rgeos&quot;, &quot;sf&quot;, &quot;ggmap&quot;, &quot;mapview&quot;, &quot;readr&quot;, &quot;knitr&quot;, &quot;ggrepel&quot;)
@@ -340,7 +340,7 @@ destdir = tempdir(),
 load = TRUE,
 returnclass = &quot;sf&quot;)</code></pre>
 <pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: &quot;C:\Users\pvelazquez\AppData\Local\Temp\RtmpScGGox&quot;, layer: &quot;ne_110m_admin_0_countries&quot;
+## Source: &quot;C:\Users\pvelazquez\AppData\Local\Temp\Rtmp63y7ot&quot;, layer: &quot;ne_110m_admin_0_countries&quot;
 ## with 177 features
 ## It has 94 fields
 ## Integer64 fields read as strings:  POP_EST NE_ID</code></pre>
