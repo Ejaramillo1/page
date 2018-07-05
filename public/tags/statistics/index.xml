@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Statistics on Standing on the shoulders of gigants</title>
+    <link>/tags/statistics/</link>
+    <description>Recent content in Statistics on Standing on the shoulders of gigants</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018</copyright>
+    <lastBuildDate>Mon, 02 Jul 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/statistics/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>NOMAS POR CURA</title>
+      <link>/post/bloomberg-billionaires-index/</link>
+      <pubDate>Mon, 02 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/bloomberg-billionaires-index/</guid>
+      <description>En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG https://www.bloomberg.com/billionaires/ para realizar uno ejercicio de análisis nomás por cura.
+El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo posicionadas del 1ro al 500vo lugar. Sin embargo al ser sólo una tabla rasa no nos ofrece nada divertido para visualizar.</description>
+    </item>
+    
+  </channel>
+</rss>
