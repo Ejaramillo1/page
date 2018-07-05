@@ -19,7 +19,7 @@
   
   <meta name="description" content="En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG https://www.bloomberg.com/billionaires/ para realizar un ejercicio de análisis nomás por cura.
 Esta es una imagen donde se muestra la tabla original.
-knitr::include_graphics(&quot;bill_idx.JPG&quot;)El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato pues los tenemos que contar uno por uno.">
+El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato pues los tenemos que contar uno por uno.">
 
   
   <link rel="alternate" hreflang="en-us" href="/post/bloomberg-billionaires-index/">
@@ -97,12 +97,12 @@ knitr::include_graphics(&quot;bill_idx.JPG&quot;)El índice de billonarios de b
   <meta property="og:title" content="NOMAS POR CURA | Standing on the shoulders of gigants">
   <meta property="og:description" content="En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG https://www.bloomberg.com/billionaires/ para realizar un ejercicio de análisis nomás por cura.
 Esta es una imagen donde se muestra la tabla original.
-knitr::include_graphics(&quot;bill_idx.JPG&quot;)El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato pues los tenemos que contar uno por uno.">
+El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato pues los tenemos que contar uno por uno.">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2018-07-02T00:00:00&#43;00:00">
   
-  <meta property="article:modified_time" content="2018-07-05T15:44:56-07:00">
+  <meta property="article:modified_time" content="2018-07-05T15:53:37-07:00">
   
 
   
@@ -312,8 +312,10 @@ knitr::include_graphics(&quot;bill_idx.JPG&quot;)El índice de billonarios de b
 
 <p>En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG <a href="https://www.bloomberg.com/billionaires/" class="uri">https://www.bloomberg.com/billionaires/</a> para realizar un ejercicio de análisis nomás por cura.</p>
 <p>Esta es una imagen donde se muestra la tabla original.</p>
-<pre class="r"><code>knitr::include_graphics(&quot;bill_idx.JPG&quot;)</code></pre>
-<p><img src="bill_idx.JPG" width="950" /></p>
+<div class="figure">
+<img src="bloomberg.png" />
+
+</div>
 <p>El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato pues los tenemos que contar uno por uno. Al ser sólo una tabla (-.-) &lt;– <em>carita de weva</em> no nos ofrece nada divertido para visualizar. Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo <strong><em>SPOILER ALERT!!!</em></strong> es <strong>ESTADOS UNIDOS</strong>.</p>
 <p>Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en ésta ardua y dura tarea de copiar y pegar información de internet.</p>
 <pre class="r"><code>library(easypackages)
@@ -819,7 +821,7 @@ destdir = tempdir(),
 load = TRUE,
 returnclass = &quot;sf&quot;)</code></pre>
 <pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: &quot;C:\Users\pvelazquez\AppData\Local\Temp\RtmpEDMf0W&quot;, layer: &quot;ne_110m_admin_0_countries&quot;
+## Source: &quot;C:\Users\pvelazquez\AppData\Local\Temp\Rtmp0CVnK4&quot;, layer: &quot;ne_110m_admin_0_countries&quot;
 ## with 177 features
 ## It has 94 fields
 ## Integer64 fields read as strings:  POP_EST NE_ID</code></pre>
@@ -828,7 +830,7 @@ returnclass = &quot;sf&quot;)</code></pre>
   geom_point(data = countr_dat, aes(x = LONGITUDE, y = LATITUDE,  size = `NUMBER OF BILLIONAIRES`, colour = as.factor(`NUMBER OF BILLIONAIRES`), alpha = .5), inherit.aes = FALSE) +
   scale_size_continuous(range = c(2,9)) +
   theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="/post/2018-07-02-bloomberg-billionaires-index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="/post/2018-07-02-bloomberg-billionaires-index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>En este mapa mostramos de igual manera el número de billonarios por país. Las bolitas de colores representan la ubicación geográfica de los billonarios y el tamaño de la bolita representa la cantidad de billonarios por país. Por ahorita le vamos a dejar ahí. Si quieren más información, la pueden consultar en el link. <a href="https://www.bloomberg.com/billionaires/" class="uri">https://www.bloomberg.com/billionaires/</a></p>
 
     </div>
