@@ -15,10 +15,6 @@ categories: []
 
 En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG https://www.bloomberg.com/billionaires/ para realizar un ejercicio de análisis nomás por cura.
 
-Esta es una imagen donde se muestra la tabla original. 
-
-![](bloomberg.png)
-
 El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato pues los tenemos que contar uno por uno. Al ser sólo una tabla (-.-) <-- _carita de weva_ no nos ofrece nada divertido para visualizar. Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo **_SPOILER ALERT!!!_** es **ESTADOS UNIDOS**.
 
 Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en ésta ardua y dura tarea de copiar y pegar información de internet. 
