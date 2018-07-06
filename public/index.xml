@@ -135,8 +135,8 @@ countries_locations &amp;lt;- read_csv(&amp;quot;countries_locations.csv&amp;quo
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;%
   select(SOVEREIGNT) %&amp;gt;%
   group_by(SOVEREIGNT) %&amp;gt;%
-  summarise(`NO BILLONARIOS` = n()) %&amp;gt;%
-  arrange(desc(`NO BILLONARIOS`)) %&amp;gt;%
+  summarise(`NRO.BILLONARIOS` = n()) %&amp;gt;%
+  arrange(desc(`NRO.BILLONARIOS`)) %&amp;gt;%
   kable() %&amp;gt;%
   kable_styling(bootstrap_options = &amp;quot;striped&amp;quot;, full_width = F, position = &amp;quot;left&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;table class=&#34;table table-striped&#34; style=&#34;width: auto !important; &#34;&gt;
@@ -146,7 +146,7 @@ countries_locations &amp;lt;- read_csv(&amp;quot;countries_locations.csv&amp;quo
 SOVEREIGNT
 &lt;/th&gt;
 &lt;th style=&#34;text-align:right;&#34;&gt;
-NO BILLONARIOS
+NRO.BILLONARIOS
 &lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
@@ -541,7 +541,7 @@ destdir = tempdir(),
 load = TRUE,
 returnclass = &amp;quot;sf&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## OGR data source with driver: ESRI Shapefile 
-## Source: &amp;quot;C:\Users\pvelazquez\AppData\Local\Temp\RtmpuedRK6&amp;quot;, layer: &amp;quot;ne_110m_admin_0_countries&amp;quot;
+## Source: &amp;quot;C:\Users\pvelazquez\AppData\Local\Temp\Rtmp2lazIC&amp;quot;, layer: &amp;quot;ne_110m_admin_0_countries&amp;quot;
 ## with 177 features
 ## It has 94 fields
 ## Integer64 fields read as strings:  POP_EST NE_ID&lt;/code&gt;&lt;/pre&gt;

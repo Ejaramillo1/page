@@ -152,8 +152,8 @@ En la tabla la columna **NO BILLONARIOS** quiere decir número de billonarios lu
 df %>%
   select(SOVEREIGNT) %>%
   group_by(SOVEREIGNT) %>%
-  summarise(`NO BILLONARIOS` = n()) %>%
-  arrange(desc(`NO BILLONARIOS`)) %>%
+  summarise(`NRO.BILLONARIOS` = n()) %>%
+  arrange(desc(`NRO.BILLONARIOS`)) %>%
   kable() %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
