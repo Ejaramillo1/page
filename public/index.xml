@@ -36,13 +36,15 @@
 
 
 &lt;p&gt;En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG &lt;a href=&#34;https://www.bloomberg.com/billionaires/&#34; class=&#34;uri&#34;&gt;https://www.bloomberg.com/billionaires/&lt;/a&gt; para realizar un ejercicio de análisis nomás por cura.&lt;/p&gt;
-&lt;p&gt;El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato pues los tenemos que contar uno por uno. Al ser sólo una tabla (-.-) &amp;lt;– &lt;em&gt;carita de weva&lt;/em&gt; no nos ofrece nada divertido para visualizar. Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo &lt;strong&gt;&lt;em&gt;SPOILER ALERT!!!&lt;/em&gt;&lt;/strong&gt; es &lt;strong&gt;ESTADOS UNIDOS&lt;/strong&gt;.&lt;/p&gt;
-&lt;p&gt;Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en ésta ardua y dura tarea de copiar y pegar información de internet.&lt;/p&gt;
+&lt;p&gt;El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato, los tendríamos que contar uno por uno. Al ser sólo una tabla (-.-) &amp;lt;– &lt;em&gt;carita de weva&lt;/em&gt;, no nos ofrece nada divertido para visualizar.&lt;/p&gt;
+&lt;p&gt;Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo &lt;strong&gt;&lt;em&gt;SPOILER ALERT!!!&lt;/em&gt;&lt;/strong&gt; es &lt;strong&gt;ESTADOS UNIDOS&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en esta ardua y dura tarea de copiar y pegar información de internet.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(easypackages)
 my_packages &amp;lt;- c(&amp;quot;rvest&amp;quot;, &amp;quot;tidyverse&amp;quot;, &amp;quot;rgeos&amp;quot;, &amp;quot;sf&amp;quot;, &amp;quot;ggmap&amp;quot;, &amp;quot;mapview&amp;quot;, &amp;quot;readr&amp;quot;, &amp;quot;knitr&amp;quot;, &amp;quot;ggrepel&amp;quot;, &amp;quot;kableExtra&amp;quot;)
 libraries(my_packages)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Para conseguir los datos, podríamos hacer un simple copy-paste de tooooooda la tabla y luego pegarla en excel pero la neta &lt;strong&gt;QUE WEVA&lt;/strong&gt; además, cada vez que necesitemos traer los datos tenemos que hacer la misma operación (copiar y pegar los 500 registros a mano) osea &lt;strong&gt;MAS QUE WEVA&lt;/strong&gt;.Por esto, haremos uso de la magia de las computadoras, el conocimiento milenario de los programadores que crearon el paquete de funciones &lt;strong&gt;rvest&lt;/strong&gt;, y mucho internet para traer la tabla.&lt;/p&gt;
-&lt;p&gt;Lo chido de esto es que la computadora se comunica con la página web cada vez que se hace la operación entonces, uno sólo tiene que picar el botoncito para que se baje la info solita.&lt;/p&gt;
+&lt;p&gt;Para conseguir los datos podríamos hacer un simple copy-paste de tooooooda la tabla y luego pegarla en excel pero la neta &lt;strong&gt;QUE WEVA&lt;/strong&gt;, además, cada vez que la tabla se actualiza tendríamos que hacer la misma operación (copiar y pegar los 500 registros a mano) osea &lt;strong&gt;MAS QUE WEVA&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Por esto, haremos uso de la magia de las computadoras, el conocimiento milenario de los programadores que crearon el paquete de funciones &lt;strong&gt;rvest&lt;/strong&gt; para el lenguaje de programación &lt;strong&gt;R&lt;/strong&gt; y mucho internet para traer la tabla.&lt;/p&gt;
+&lt;p&gt;Lo chido de esto, es que la computadora se comunica con la página web cada vez que se hace la operación entonces, uno sólo tiene que picar el botoncito para que se baje la info solita, &lt;em&gt;después de programar que el botoncito haga esto obvio&lt;/em&gt;.&lt;/p&gt;
 &lt;p&gt;Comenzamos el archi-reconocido &lt;em&gt;&lt;strong&gt;copy-paste&lt;/strong&gt;&lt;/em&gt; indicando el &lt;strong&gt;&lt;em&gt;url&lt;/em&gt;&lt;/strong&gt; de donde jalaremos la información luego, guardamos en un vector de caracteres la info de la columna. Y &lt;strong&gt;TATAAAAAAAAAAAN&lt;/strong&gt; listo.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;url &amp;lt;- &amp;quot;https://www.bloomberg.com/billionaires/&amp;quot;
 
@@ -90,8 +92,7 @@ industry &amp;lt;- read_html(url) %&amp;gt;%
   html_text()
 
 industry &amp;lt;- industry[(-1)]&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ya que tenemos listos nuestros ingredientes muchachitos…….vamos a juntarlos todos por que así separados no rifan. Como las columnas que tienen numeritos vienen con carateres especiales de moneda, suma y otros tenemos que quitarlos. Esto por que si quieres sumar dos celdas con un carácter especial la compu no lo reconoce como número y pues…….. te tira error.&lt;/p&gt;
-&lt;p&gt;Ah! también le cambio el nombre a Estados Unidos y Rusia, por que así me los enseñaron en la primaria………&lt;/p&gt;
+&lt;p&gt;Ya que tenemos listos nuestros ingredientes los juntamos. Ah! también le cambio el nombre a Estados Unidos y Rusia, por que así me los enseñaron en la primaria………&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df &amp;lt;- tibble::tibble(position, nombre, SOVEREIGNT, net_worth, last_change, YTD_change) %&amp;gt;%
   mutate(net_worth = as.numeric(str_extract(net_worth, pattern = &amp;quot;(\\d+\\.?\\d+)&amp;quot;)),
          last_change = as.numeric(str_extract(last_change, pattern = &amp;quot;(\\d+\\.?\\d?+)&amp;quot;)),
@@ -102,8 +103,7 @@ industry &amp;lt;- industry[(-1)]&lt;/code&gt;&lt;/pre&gt;
 
 countries_locations &amp;lt;- read_csv(&amp;quot;countries_locations.csv&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning: Missing column names filled in: &amp;#39;X1&amp;#39; [1]&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Ya teniendo nuestros ingredientes en la cazuela, los vamos a poner en la lumbre y le comenzamos a mover pa’ que salga el olor y nos de hambre. Osea.&lt;/p&gt;
-&lt;p&gt;Vamos a trabajar con los datos para poderlos presentar.&lt;/p&gt;
+&lt;p&gt;Luego trabajamos los datos para presentar correctamente.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;countr_dat &amp;lt;- df %&amp;gt;%
   filter(!SOVEREIGNT %in% c(&amp;quot;Gerorgia&amp;quot;)) %&amp;gt;%
   group_by(SOVEREIGNT) %&amp;gt;%
@@ -541,7 +541,7 @@ destdir = tempdir(),
 load = TRUE,
 returnclass = &amp;quot;sf&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## OGR data source with driver: ESRI Shapefile 
-## Source: &amp;quot;C:\Users\pvelazquez\AppData\Local\Temp\RtmpsRGoZV&amp;quot;, layer: &amp;quot;ne_110m_admin_0_countries&amp;quot;
+## Source: &amp;quot;C:\Users\pvelazquez\AppData\Local\Temp\RtmpuedRK6&amp;quot;, layer: &amp;quot;ne_110m_admin_0_countries&amp;quot;
 ## with 177 features
 ## It has 94 fields
 ## Integer64 fields read as strings:  POP_EST NE_ID&lt;/code&gt;&lt;/pre&gt;

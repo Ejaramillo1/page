@@ -33,13 +33,15 @@ categories: []
 
 
 <p>En la entrega de este blog vamos a utilizar utilizar la tabla de billonarios de BLOOMBERG <a href="https://www.bloomberg.com/billionaires/" class="uri">https://www.bloomberg.com/billionaires/</a> para realizar un ejercicio de análisis nomás por cura.</p>
-<p>El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato pues los tenemos que contar uno por uno. Al ser sólo una tabla (-.-) &lt;– <em>carita de weva</em> no nos ofrece nada divertido para visualizar. Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo <strong><em>SPOILER ALERT!!!</em></strong> es <strong>ESTADOS UNIDOS</strong>.</p>
-<p>Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en ésta ardua y dura tarea de copiar y pegar información de internet.</p>
+<p>El índice de billonarios de bloomberg nos ofrece datos sobre las personas más adineradas del mundo. En total se contabilizan 500 personas pero, por ejemplo, si quisieramos saber cuantos son por país, cuantos son por industria u otro dato, los tendríamos que contar uno por uno. Al ser sólo una tabla (-.-) &lt;– <em>carita de weva</em>, no nos ofrece nada divertido para visualizar.</p>
+<p>Nomás por cura nosotros vamos a hacer un breve análisis de la tabla. Lo primero que queremos saber es cuál es el país con más billonarios del mundo <strong><em>SPOILER ALERT!!!</em></strong> es <strong>ESTADOS UNIDOS</strong>.</p>
+<p>Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en esta ardua y dura tarea de copiar y pegar información de internet.</p>
 <pre class="r"><code>library(easypackages)
 my_packages &lt;- c(&quot;rvest&quot;, &quot;tidyverse&quot;, &quot;rgeos&quot;, &quot;sf&quot;, &quot;ggmap&quot;, &quot;mapview&quot;, &quot;readr&quot;, &quot;knitr&quot;, &quot;ggrepel&quot;, &quot;kableExtra&quot;)
 libraries(my_packages)</code></pre>
-<p>Para conseguir los datos, podríamos hacer un simple copy-paste de tooooooda la tabla y luego pegarla en excel pero la neta <strong>QUE WEVA</strong> además, cada vez que necesitemos traer los datos tenemos que hacer la misma operación (copiar y pegar los 500 registros a mano) osea <strong>MAS QUE WEVA</strong>.Por esto, haremos uso de la magia de las computadoras, el conocimiento milenario de los programadores que crearon el paquete de funciones <strong>rvest</strong>, y mucho internet para traer la tabla.</p>
-<p>Lo chido de esto es que la computadora se comunica con la página web cada vez que se hace la operación entonces, uno sólo tiene que picar el botoncito para que se baje la info solita.</p>
+<p>Para conseguir los datos podríamos hacer un simple copy-paste de tooooooda la tabla y luego pegarla en excel pero la neta <strong>QUE WEVA</strong>, además, cada vez que la tabla se actualiza tendríamos que hacer la misma operación (copiar y pegar los 500 registros a mano) osea <strong>MAS QUE WEVA</strong>.</p>
+<p>Por esto, haremos uso de la magia de las computadoras, el conocimiento milenario de los programadores que crearon el paquete de funciones <strong>rvest</strong> para el lenguaje de programación <strong>R</strong> y mucho internet para traer la tabla.</p>
+<p>Lo chido de esto, es que la computadora se comunica con la página web cada vez que se hace la operación entonces, uno sólo tiene que picar el botoncito para que se baje la info solita, <em>después de programar que el botoncito haga esto obvio</em>.</p>
 <p>Comenzamos el archi-reconocido <em><strong>copy-paste</strong></em> indicando el <strong><em>url</em></strong> de donde jalaremos la información luego, guardamos en un vector de caracteres la info de la columna. Y <strong>TATAAAAAAAAAAAN</strong> listo.</p>
 <pre class="r"><code>url &lt;- &quot;https://www.bloomberg.com/billionaires/&quot;
 
@@ -87,8 +89,7 @@ industry &lt;- read_html(url) %&gt;%
   html_text()
 
 industry &lt;- industry[(-1)]</code></pre>
-<p>Ya que tenemos listos nuestros ingredientes muchachitos…….vamos a juntarlos todos por que así separados no rifan. Como las columnas que tienen numeritos vienen con carateres especiales de moneda, suma y otros tenemos que quitarlos. Esto por que si quieres sumar dos celdas con un carácter especial la compu no lo reconoce como número y pues…….. te tira error.</p>
-<p>Ah! también le cambio el nombre a Estados Unidos y Rusia, por que así me los enseñaron en la primaria………</p>
+<p>Ya que tenemos listos nuestros ingredientes los juntamos. Ah! también le cambio el nombre a Estados Unidos y Rusia, por que así me los enseñaron en la primaria………</p>
 <pre class="r"><code>df &lt;- tibble::tibble(position, nombre, SOVEREIGNT, net_worth, last_change, YTD_change) %&gt;%
   mutate(net_worth = as.numeric(str_extract(net_worth, pattern = &quot;(\\d+\\.?\\d+)&quot;)),
          last_change = as.numeric(str_extract(last_change, pattern = &quot;(\\d+\\.?\\d?+)&quot;)),
@@ -99,8 +100,7 @@ industry &lt;- industry[(-1)]</code></pre>
 
 countries_locations &lt;- read_csv(&quot;countries_locations.csv&quot;)</code></pre>
 <pre><code>## Warning: Missing column names filled in: &#39;X1&#39; [1]</code></pre>
-<p>Ya teniendo nuestros ingredientes en la cazuela, los vamos a poner en la lumbre y le comenzamos a mover pa’ que salga el olor y nos de hambre. Osea.</p>
-<p>Vamos a trabajar con los datos para poderlos presentar.</p>
+<p>Luego trabajamos los datos para presentar correctamente.</p>
 <pre class="r"><code>countr_dat &lt;- df %&gt;%
   filter(!SOVEREIGNT %in% c(&quot;Gerorgia&quot;)) %&gt;%
   group_by(SOVEREIGNT) %&gt;%
@@ -538,7 +538,7 @@ destdir = tempdir(),
 load = TRUE,
 returnclass = &quot;sf&quot;)</code></pre>
 <pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: &quot;C:\Users\pvelazquez\AppData\Local\Temp\RtmpsRGoZV&quot;, layer: &quot;ne_110m_admin_0_countries&quot;
+## Source: &quot;C:\Users\pvelazquez\AppData\Local\Temp\RtmpuedRK6&quot;, layer: &quot;ne_110m_admin_0_countries&quot;
 ## with 177 features
 ## It has 94 fields
 ## Integer64 fields read as strings:  POP_EST NE_ID</code></pre>
