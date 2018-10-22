@@ -376,4 +376,5 @@ Si observamos detenidamente el la gráfica color negro podemos ver que la 11va v
 
 En el siguiente blog continuaremos con la exploración de la base de datos y probablemente realizaremos las estimaciones de la probabilidad de supervivencia en función de las variables creadas en esta parte.
 
+Por lo pronto terminamos con éste análisis.
 
