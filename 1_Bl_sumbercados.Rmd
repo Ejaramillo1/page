@@ -26,7 +26,7 @@ Posteriormente vamos a llamar a la base de datos de DENUE previamente descargada
 
 ```{r warning=FALSE}
 
-dbdenue <- read_csv("denue_inegi_02_.csv")
+dbdenue <- read_csv("content/post/denue_inegi_02_.csv")
 
 
 ```
@@ -34,7 +34,8 @@ dbdenue <- read_csv("denue_inegi_02_.csv")
 luego vamos a observar la estructura de la base de datos que acabamos de obtener
 
 ```{r warning=FALSE}
-summary(dbdenue)
+
+glimpse(dbdenue)
 
 ```
 
@@ -97,8 +98,7 @@ Podemos observar que, agregando metadata a la base de datos se puede apreciar un
 
 
 ```{r warning=FALSE}
-tj <- c(lon=-116.944333,
-        lat=32.491566)
+tj <- c(lon=-116.944333,lat=32.491566)
 
 tjmap <- get_map(tj, zoom = 11, maptype = c("roadmap"))
 

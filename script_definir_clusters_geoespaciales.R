@@ -4,7 +4,7 @@ libraries(my_packages)
 
 # Descarga la base de datos de DENUE
 
-dbdenue <- read_csv("/Users/pvelazquez/Documents/PROYECTOS/INDUSTRIAL/DATOS/02_0317/denue_02_csv/conjunto_de_datos/denue_inegi_02_.csv", guess_max = 100000)
+dbdenue <- read_csv("C:/Users/pvelazquez/Documents/PROYECTOS/INDUSTRIAL/DATOS/02_0317/denue_02_csv/conjunto_de_datos/denue_inegi_02_.csv", guess_max = 100000)
 
 db <- dbdenue %>%
   filter(municipio %in% c("Tijuana")) %>%

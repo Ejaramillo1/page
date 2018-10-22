@@ -3,18 +3,65 @@
 ##########################################################################
 
 library(easypackages)
-my_packages <- c("tidyverse", "readxl", "lubridate", "geosphere", "scales", "sf", "ggmap", "ggrepel", "cowplot")
+my_packages <- c("tidyverse", "readxl", "lubridate", "geosphere", "scales", "sf", "ggmap", "ggrepel", "cowplot", "sp")
 libraries(my_packages)
 
-# Descarga la base de datos de DENUE
 
-dbdenue <- read_csv("/Users/pvelazquez/Documents/PROYECTOS/INDUSTRIAL/DATOS/02_0317/denue_02_csv/conjunto_de_datos/denue_inegi_02_.csv", guess_max = 1000000)
+###########################################
+#### Descarga la base de datos de DENUE####
+###########################################.
+
+db <- st_read("C:/Users/ejaramillo/Documents/proyectos_lalo/pagina_blog/DATOS DENUE/conjunto_de_datos/denue_inegi_02_.shp")
+
+
+#########################################################################
+### SCRIPT PARA AGRUPAR EMPRESAS EN CLUSTERS EN TIJUANA #################
+#########################################################################
+
+
+denue_db <- db %>%
+  separate(fecha_alta, into = c("mes_alta", "year_alta"), sep = "\\s") %>%
+  filter(municipio %in% c("Tijuana"))  %>%
+  mutate(codigo_industria = as.numeric(as.character(factor(str_sub(codigo_act,1,2)))),
+         filtro = if_else(codigo_industria == 31 | codigo_industria == 32 | codigo_industria == 33, 1, 
+                          if_else(str_detect(codigo_industria, "31 a 50 personas") == TRUE,1,0)))
+  
+
+denue_sf <- dbdenue %>%
+  dplyr::select(latitud, longitud ,cve_loc,municipio ,id, nom_estab, raz_social, codigo_act, nombre_act, per_ocu, tipo_vial, tipo_asent, nomb_asent, tipoCenCom, nom_CenCom, localidad, ageb, manzana, fecha_alta)  %>%
+  separate(fecha_alta, into = c("mes_alta", "year_alta"), sep = "\\s") %>%
+  mutate(latitud = as.numeric(latitud),
+         longitud = as.numeric(longitud),
+         day = 01,
+         fecha = ymd(as_date(paste0(year_alta, mes_alta, day))),
+         codigo_industria = factor(str_sub(codigo_act,1,2))) %>%
+  filter(municipio %in% "Tijuana" & 
+           codigo_industria %in% c("31", "32", "33") &
+           per_ocu %in% c("101 a 250 personas", "251 y más personas")) %>%
+  rename_all(funs(str_to_lower(.))) %>%
+  mutate(LATITUD = latitud,
+         LONGITUD = longitud) %>%
+  rename("y" = LATITUD,
+         "x" = LONGITUD,
+         "CVE_AGEB" = "ageb") %>%
+  select(x, y, CVE_AGEB) %>%
+  droplevels()
+
+
+
+
+
+dbdenue <- read_csv("C:/Users/ejaramillo/Documents/proyectos_lalo/pagina_blog/DATOS DENUE/conjunto_de_datos/denue_inegi_02_.csv", guess_max = 1000000)
 
 # Descarga la base de datos del CENSO
 
 dbcenso <- read.csv("C:/Users/pvelazquez/Desktop/CENSO VIVIENDA/resultados_ageb_urbana_02_cpv2010/conjunto_de_datos/resultados_ageb_urbana_02_cpv2010.csv", na.strings = c("*"))
 
-serv_pub <- st_read("C:/Users/pvelazquez/Google Drive/MEXICO MAPA/Baja California/conjunto de datos/02sip.shp")
+
+
+
+
+
 
 maphosp <- serv_pub %>%
   mutate_if(., is.character, funs(stringi::stri_trans_general(.,"latin-ascii"))) %>%
@@ -42,29 +89,6 @@ denue_ageb <- dbdenue %>%
             "x" = mean(longitud)) %>%
   distinct(CVE_AGEB, x, y)
 
-#########################################################################
-### SCRIPT PARA AGRUPAR EMPRESAS EN CLUSTERS EN TIJUANA #################
-#########################################################################
-
-denue_sf <- dbdenue %>%
-  dplyr::select(latitud, longitud ,cve_loc,municipio ,id, nom_estab, raz_social, codigo_act, nombre_act, per_ocu, tipo_vial, tipo_asent, nomb_asent, tipoCenCom, nom_CenCom, localidad, ageb, manzana, fecha_alta)  %>%
-  separate(fecha_alta, into = c("mes_alta", "year_alta"), sep = "\\s") %>%
-  mutate(latitud = as.numeric(latitud),
-         longitud = as.numeric(longitud),
-         day = 01,
-         fecha = ymd(as_date(paste0(year_alta, mes_alta, day))),
-         codigo_industria = factor(str_sub(codigo_act,1,2))) %>%
-  filter(municipio %in% "Tijuana" & 
-           codigo_industria %in% c("31", "32", "33") &
-           per_ocu %in% c("101 a 250 personas", "251 y más personas")) %>%
-  rename_all(funs(str_to_lower(.))) %>%
-  mutate(LATITUD = latitud,
-         LONGITUD = longitud) %>%
-  rename("y" = LATITUD,
-         "x" = LONGITUD,
-         "CVE_AGEB" = "ageb") %>%
-  select(x, y, CVE_AGEB) %>%
-  droplevels()
 
 
 ci <- dbdenue %>%

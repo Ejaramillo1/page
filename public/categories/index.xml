@@ -11,5 +11,32 @@
 	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
+    <item>
+      <title>Data Analisis</title>
+      <link>/categories/data-analisis/</link>
+      <pubDate>Sat, 20 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/data-analisis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>EDA</title>
+      <link>/categories/eda/</link>
+      <pubDate>Sat, 20 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/eda/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Feature engineering</title>
+      <link>/categories/feature-engineering/</link>
+      <pubDate>Sat, 20 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/feature-engineering/</guid>
+      <description></description>
+    </item>
+    
   </channel>
 </rss>

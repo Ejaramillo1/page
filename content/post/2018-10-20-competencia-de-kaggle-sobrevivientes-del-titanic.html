@@ -1,0 +1,362 @@
+---
+title: Competencia de Kaggle; "Sobrevivientes del Titanic"
+author: Eduardo Jaramillo
+date: '2018-10-20'
+slug: competencia-de-kaggle-sobrevivientes-del-titanic
+categories:
+  - Data Analisis
+  - EDA
+  - Feature engineering
+tags:
+  - Fun
+  - Statistics
+header:
+  caption: ''
+  image: ''
+---
+
+
+
+<div id="sobrevivientes-del-titanic-parte-i" class="section level1">
+<h1>Sobrevivientes del Titanic parte I</h1>
+<div id="analisis-exploratorio" class="section level2">
+<h2>Análisis exploratorio</h2>
+<p>Los aspirantes a científicos de datos generalmente somos personas curiosas a las que les gusta navegar por internet buscando recursos que apoyen y consoliden nuestros conocimientos.</p>
+<p>Un sitio muy popular donde se pueden encontrar mucha información sobre este tema es el sitio web <strong>kaggle.com</strong> en el que se desarrollan competencias entre personas apasionadas por los datos con el objetivo de generar los mejores modelos en función de las características particulares de cada conjunto de datos.</p>
+<p>La base de datos del Titanic es uno de los primeros pasos para adentrarse en el mundo de la ciencia de datos desde el aprendizaje en ésta página <strong>Kaggle</strong> con muchos recursos a la mano. El objetivo de la base de datos y, la competencia es tratar de predecir si un pasajero sobrevive o no.</p>
+<p>Como en todos los ejercicios primero vamos a cargar los paquetes de funciones que se utilizarán en el ejercicio de estimación.</p>
+<pre class="r"><code>library(&quot;easypackages&quot;)
+my_packages &lt;- c(&quot;tidyverse&quot;, &quot;knitr&quot;)
+libraries(my_packages)</code></pre>
+<p>Posteriormente vamos a subir la tabla de datos con la que trabajaremos</p>
+<pre class="r"><code>train &lt;- read_csv(&quot;C:/Users/ejaramillo/Documents/titanic_competition_kaggle/train.csv&quot;) 
+test &lt;- read_csv(&quot;C:/Users/ejaramillo/Documents/titanic_competition_kaggle/test.csv&quot;)</code></pre>
+<p>Para no tener que hacer el proceso de limpieza dos veces vamos a unir las bases de datos train and test, así tendremos los mismos parámetros</p>
+<pre class="r"><code>test$Survived &lt;- NA
+
+all &lt;- rbind(train, test)</code></pre>
+<p>Vamos a echar una ojeada a la tabla de datos para saber como están compuestas las variables.</p>
+<pre class="r"><code>glimpse(all)</code></pre>
+<pre><code>## Observations: 1,309
+## Variables: 12
+## $ PassengerId &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,...
+## $ Survived    &lt;int&gt; 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0,...
+## $ Pclass      &lt;int&gt; 3, 1, 3, 1, 3, 3, 1, 3, 3, 2, 3, 1, 3, 3, 3, 2, 3,...
+## $ Name        &lt;chr&gt; &quot;Braund, Mr. Owen Harris&quot;, &quot;Cumings, Mrs. John Bra...
+## $ Sex         &lt;chr&gt; &quot;male&quot;, &quot;female&quot;, &quot;female&quot;, &quot;female&quot;, &quot;male&quot;, &quot;mal...
+## $ Age         &lt;dbl&gt; 22, 38, 26, 35, 35, NA, 54, 2, 27, 14, 4, 58, 20, ...
+## $ SibSp       &lt;int&gt; 1, 1, 0, 1, 0, 0, 0, 3, 0, 1, 1, 0, 0, 1, 0, 0, 4,...
+## $ Parch       &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 1, 0, 0, 5, 0, 0, 1,...
+## $ Ticket      &lt;chr&gt; &quot;A/5 21171&quot;, &quot;PC 17599&quot;, &quot;STON/O2. 3101282&quot;, &quot;1138...
+## $ Fare        &lt;dbl&gt; 7.2500, 71.2833, 7.9250, 53.1000, 8.0500, 8.4583, ...
+## $ Cabin       &lt;chr&gt; NA, &quot;C85&quot;, NA, &quot;C123&quot;, NA, NA, &quot;E46&quot;, NA, NA, NA, ...
+## $ Embarked    &lt;chr&gt; &quot;S&quot;, &quot;C&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;Q&quot;, &quot;S&quot;, &quot;S&quot;, &quot;S&quot;, &quot;C&quot;, ...</code></pre>
+<p>Como podemos ver arriba, en nuestra tabla de datos hay doce variables de las cuales <strong>Fare</strong>, <strong>Age</strong> y <strong>PassengerId</strong>, las 9 variables más con de tipo categoricas sin embargo la variable <strong>Pclass</strong> está como un entero o variable numérica por lo que debemos recodificarla para obtener resultados satisfactorios.</p>
+<p>Una de las tareas principales al realizar análisis estadístico es conocer la base de datos y las relaciones entre las variables y también los valores perdidos. Para esto aplicaremos una función que nos ayudará a contar los valores perdidos en cada una de las columnas en nuestra tabla de datos.</p>
+<pre class="r"><code>sapply(all, function(x){sum(is.na(x))})</code></pre>
+<pre><code>## PassengerId    Survived      Pclass        Name         Sex         Age 
+##           0         418           0           0           0         263 
+##       SibSp       Parch      Ticket        Fare       Cabin    Embarked 
+##           0           0           0           1        1014           2</code></pre>
+<p>Según el conteo, las variables que tienen más valores perdidos son <em>Age</em>, <em>Cabin</em> y <em>Embarked</em>. Confirmamos esto de manera gráfica con una función que nos ayuda a visualizar los valores perdidos de mejor manera.</p>
+</div>
+</div>
+<div id="explorando-algunas-de-las-variables-mas-importantes" class="section level1">
+<h1>Explorando algunas de las variables más importantes</h1>
+<pre class="r"><code>plot_Missing &lt;- function(data_in, title = NULL){
+  temp_df &lt;- as.data.frame(ifelse(is.na(data_in), 0, 1))
+  temp_df &lt;- temp_df[,order(colSums(temp_df))]
+  data_temp &lt;- expand.grid(list(x = 1:nrow(temp_df), y = colnames(temp_df)))
+  data_temp$m &lt;- as.vector(as.matrix(temp_df))
+  data_temp &lt;- data.frame(x = unlist(data_temp$x), y = unlist(data_temp$y), m = unlist(data_temp$m))
+  ggplot(data_temp) + geom_tile(aes(x=x, y=y, fill=factor(m))) + 
+    scale_fill_manual(values=c(&quot;white&quot;, &quot;black&quot;), name=&quot;Missing\n(0=Yes, 1=No)&quot;) +
+    theme_light() + ylab(&quot;&quot;) + xlab(&quot;&quot;) + ggtitle(title)
+}
+
+
+plot_Missing(all)</code></pre>
+<p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Confirmamos por lo tanto que las variables con mayor número de valores perdidos son la edad, la cabina y el lugar en el que se embarcaron, por otro lado la variable <strong>Survived</strong> muestra una gran cantidad de valores perdidos, esto se da principalmente por que unimos la tabla de datos de entrenamiento y de modelado.</p>
+<div id="exploracion-de-la-variable-respuesta-survived" class="section level2">
+<h2>Exploración de la variable respuesta: Survived</h2>
+<p>Iniciamos la exploración de la tabla de datos analizando el comportamiento de la variable respuesta, en este caso de trata de una variable dicotómica que indica si la presona en cuestión sobrevivió o no.</p>
+<pre class="r"><code>all %&gt;%
+  select(Sex, Survived, Pclass) %&gt;%
+  filter(!is.na(Survived)) %&gt;%
+  group_by(Survived, Sex) %&gt;%
+  summarise(n()) %&gt;%
+  ggplot(aes(x = factor(Survived) , y = `n()`)) +
+  geom_bar(stat = &quot;identity&quot;, aes(fill = factor(Survived))) +
+  geom_label(aes(label = `n()`)) +
+  facet_wrap(~Sex)</code></pre>
+<p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>Vamos a ver ahora en qué clase viajaban una mayor cantidad de personas.</p>
+<pre class="r"><code>all %&gt;%
+  group_by(Pclass) %&gt;%
+  summarise(prcount = n()) %&gt;%
+  ggplot(aes(Pclass, prcount)) + 
+  geom_bar(stat = &quot;identity&quot;, aes(fill = factor(Pclass) )) + 
+  geom_label(aes(label = prcount)) +
+  theme_classic()</code></pre>
+<p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Observamos que la mayor cantidad de personas viajan en tercera clase. Superando sustancialmente a segunda y primera clase.</p>
+<p>Posteriormente</p>
+<pre class="r"><code>all %&gt;%
+  filter(!is.na(Survived)) %&gt;%
+  select(Sex, Survived, Pclass) %&gt;% 
+  group_by(Sex, Survived, Pclass) %&gt;%
+  summarise(prcount = n()) %&gt;%
+  arrange(desc(prcount)) %&gt;%
+  ggplot(aes(x = Sex, y = prcount)) + 
+  geom_bar(stat = &quot;identity&quot;, aes(fill = factor(Pclass))) +
+  facet_grid(~Survived)</code></pre>
+<p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>En la gráfica anterior mostramos otros datos interesantes que nos pueden dar luz acerca de la supervivencia al hundimiento. En ésta gráfica los colores representan el sexo, la división de las gráficas en tres partes representa la clase en la que viajaban los pasajeros, las barras que están encima del cero son los que no sobrevivieron y las que están encima del uno son los que no sobrevivieron.</p>
+<p>Por ejemplo vamos a comparar las barras que se encuentran encima del número cero de color azúl, o sea hombres que no sobrevivieron.</p>
+<p>Vemos que la mayor cantidad de hombres que no sobrevivieron se encuentran en tercera clase luego segunda clase y al final primera clase. Los datos los observamos en la tabla de abajo.</p>
+<p>Del total de hombres que no sobrevivieron 300 viajaban en tercera clase, 91 en segunda clase y 77 en primera clase. Por lo que podemos inferir que debido a la gran diferencia entre las varaibles éste puede ser un predictor importante</p>
+<pre class="r"><code>all %&gt;%
+  select(Sex, Survived, Pclass) %&gt;%
+  group_by(Sex, Survived, Pclass) %&gt;%
+  summarise(n()) %&gt;%
+  arrange(desc(`n()`)) %&gt;%
+  filter(Survived == 1) %&gt;%
+  spread(Pclass, `n()`) %&gt;%
+  rename(., 
+         &quot;Primera Clase&quot; = `1` , &quot;Segunda Clase&quot; = `2`, &quot;Tercera clase&quot; = `3`) %&gt;%
+  ungroup() %&gt;%
+  select(-Survived) %&gt;%
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Sex</th>
+<th align="right">Primera Clase</th>
+<th align="right">Segunda Clase</th>
+<th align="right">Tercera clase</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">female</td>
+<td align="right">91</td>
+<td align="right">70</td>
+<td align="right">72</td>
+</tr>
+<tr class="even">
+<td align="left">male</td>
+<td align="right">45</td>
+<td align="right">17</td>
+<td align="right">47</td>
+</tr>
+</tbody>
+</table>
+<p>Ahora que sucedió con las mujeres que no sobrevivieron de acuerdo a la clase en la que viajaban.</p>
+<pre class="r"><code>all %&gt;%
+  select(Sex, Survived, Pclass) %&gt;%
+  group_by(Sex, Survived, Pclass) %&gt;%
+  summarise(n()) %&gt;%
+  arrange(desc(`n()`)) %&gt;%
+  filter(Survived == 0)%&gt;%
+  spread(Pclass, `n()`) %&gt;%
+  rename(., 
+         &quot;Primera Clase&quot; = `1` , &quot;Segunda Clase&quot; = `2`, &quot;Tercera clase&quot; = `3`) %&gt;%
+  ungroup() %&gt;%
+  select(-Survived) %&gt;%
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Sex</th>
+<th align="right">Primera Clase</th>
+<th align="right">Segunda Clase</th>
+<th align="right">Tercera clase</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">female</td>
+<td align="right">3</td>
+<td align="right">6</td>
+<td align="right">72</td>
+</tr>
+<tr class="even">
+<td align="left">male</td>
+<td align="right">77</td>
+<td align="right">91</td>
+<td align="right">300</td>
+</tr>
+</tbody>
+</table>
+<p>Se observa que la mayor cantidad de mujeres que no sobrevivieron al accidente se encontraban en tercera clase, luego las que viajan en segunda y al final primera clase. Recordemos que una de las causas de la tragedia y a que las personas que sobrevivieron fueron tan pocas es por que no había suficientes barcos salvavidas. Lo que nos hace suponer que se les daba preferencia a las mujeres y, particularmente a las que viajaban en primera clase.</p>
+<pre class="r"><code>all %&gt;%
+  select(Sex, Survived, Pclass) %&gt;%
+  group_by(Sex, Survived, Pclass) %&gt;%
+  summarise(n()) %&gt;%
+  filter(Survived == 1) %&gt;%
+  spread(Pclass, `n()`) %&gt;%
+  rename(., &quot;Primera Clase&quot; = `1`, &quot;Segunda Clase&quot; = `2`, &quot;Tercera Clase&quot; = `3`) %&gt;%
+  ungroup() %&gt;%
+  select(-Survived) %&gt;%
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Sex</th>
+<th align="right">Primera Clase</th>
+<th align="right">Segunda Clase</th>
+<th align="right">Tercera Clase</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">female</td>
+<td align="right">91</td>
+<td align="right">70</td>
+<td align="right">72</td>
+</tr>
+<tr class="even">
+<td align="left">male</td>
+<td align="right">45</td>
+<td align="right">17</td>
+<td align="right">47</td>
+</tr>
+</tbody>
+</table>
+<p>Si analizamos por otro lado los sobrevivientes por sexo y clase en la que viajaban podemos observar que hay un comportamiento homogéneo en las mujeres es decir, no importa en qué clase viajes es más probable que sobrevivas que un hombre.</p>
+<p>Por otro lado los hombres que menos sobrevivieron son los que se encontraban en segunda clase, siendo esto diferente para los de tercera y primera clase, sin embargo no sabesmos si esto es natural hablando en porcentajes en función del numero de pasajeros del mismo sexo por clase.</p>
+<p>De los sobrevivientes podemos observar que la mayor proporción es para mujeres en primera clase, posteriormente mujeres en tercera y al final mujeres en segunda clase.</p>
+<p>Los hombres la mayor cantidad de sobrevivientes son 47 que viajaban en tercera clase, 45 en primera y 17 en segunda.</p>
+<pre class="r"><code>all %&gt;%
+  select(Sex, Survived, Pclass) %&gt;%
+  group_by(Sex, Survived, Pclass) %&gt;%
+  summarise(n()) %&gt;%
+  filter(Survived == 1) %&gt;%
+  arrange(desc(`n()`)) %&gt;%
+  ggplot() +
+  geom_bar(aes(x = Pclass, y = `n()`, fill = factor(Pclass)), stat = &quot;identity&quot;) + 
+  facet_wrap(~Sex)</code></pre>
+<p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>El desarrollador del kernel que estamos siguiendo indica que, si bien se puede tratar como predictores separados el sexo y la clase, es una buena práctica unirlos en una sola variable lo que nos permitirá minimizar los problemas de autocorrelación, adicionalmente en el mismo pedazo de código añadimos una variable extra en la que se extrae el título con el que se le nombrabró al pasajero en cuestión.</p>
+<pre class="r"><code>all &lt;- all %&gt;%
+  mutate(pr = factor(if_else(.$Pclass == &#39;1&#39; &amp; .$Sex == &#39;male&#39;,&quot;P1Male&quot;, 
+                      if_else(.$Pclass == &#39;2&#39; &amp; .$Sex == &#39;male&#39;, &quot;P2Male&quot;, 
+                              if_else(.$Pclass == &#39;3&#39; &amp; .$Sex == &#39;male&#39;, &quot;P3Male&quot;,
+                                      if_else(.$Pclass == 1 &amp; .$Sex == &#39;female&#39;, &quot;P1Female&quot;, 
+                                              if_else(.$Pclass == 2 &amp; .$Sex == &#39;female&#39;, &quot;P2Female&quot;, 
+                                                      if_else(.$Pclass == 3 &amp; .$Sex == &quot;female&quot;, &quot;P3Female&quot;, &quot;na&quot;))))))),
+         title = str_trim(gsub(&#39;(.*,)|(\\..*)&#39;, &#39;&#39;, .$Name)))
+
+table(all$Sex, all$title)</code></pre>
+<pre><code>##         
+##          Capt Col Don Dona  Dr Jonkheer Lady Major Master Miss Mlle Mme
+##   female    0   0   0    1   1        0    1     0      0  260    2   1
+##   male      1   4   1    0   7        1    0     2     61    0    0   0
+##         
+##           Mr Mrs  Ms Rev Sir the Countess
+##   female   0 197   2   0   0            1
+##   male   757   0   0   8   1            0</code></pre>
+<p>Después de crear la nueva variable hacemos una pequeña tabla donde observamos que hay diferentes títulos que se utilizaron, sin embargo podemos observar que hay algunos más representativos que otros, por lo que agruparemos en categorías más homogéneas el título siendo los miembros de la tripulación,</p>
+<p>Ahora vamos a tratar de relacionar la edad con los títulos para saber cómo podemos agruparlos.</p>
+<pre class="r"><code>all %&gt;%
+  group_by(title, Age, Sex) %&gt;%
+  summarise(n()) %&gt;%
+  ggplot(aes(x = title, y = Age))+
+  geom_point(aes(colour = Sex))</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (geom_point).</code></pre>
+<p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>Ahora vamos a hacer una variable que nos indique si la persona estaba casada o no, esto lo hacemos con el título que usaba la persona al embarcarse.</p>
+<pre class="r"><code>all &lt;- all %&gt;% 
+  mutate(title = factor(if_else(.$title == &#39;Capt&#39; | .$title == &#39;Col&#39; | .$title == &#39;Don&#39; | .$title == &#39;Dr&#39; | .$title == &#39;Jonkheer&#39; | .$title == &#39;Major&#39; | .$title == &#39;Rev&#39; | .$title == &#39;Sir&#39; , &quot;rate_title&quot;, 
+                                         if_else(.$title == &#39;Master&#39;, &quot;Master&quot;, 
+                                                 if_else(.$title == &#39;Miss&#39;, &quot;Miss&quot;, &quot;Mr&quot;)))))</code></pre>
+</div>
+</div>
+<div id="el-tamano-de-la-familia" class="section level1">
+<h1>El tamaño de la familia</h1>
+<p>El tamaño de la familia también es una variable que importa segun algunos analistas que ya han explorado esta base de datos, por lo que se creará una variable para estimar el tamaño de la familia con la que viajaban los pasajeros.</p>
+<pre class="r"><code>all &lt;- all %&gt;%
+  mutate(Fsize = SibSp+Parch + 1)</code></pre>
+<p>Ahora observamos el comportamiento de esta variable dependiendo de si el pasajero sobrevivió o no.</p>
+<pre class="r"><code>all %&gt;%
+  filter(!is.na(Survived)) %&gt;%
+  group_by(Survived, Fsize) %&gt;%
+  summarise(n()) %&gt;%
+  ggplot(aes(Fsize, `n()`, fill = factor(Survived))) + 
+  geom_bar(stat = &#39;identity&#39;, position = &#39;dodge&#39;) +
+  scale_x_continuous(breaks = c(1:11))</code></pre>
+<p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>Observamos que hay un claro patron donde el tamaño de la familia con la que se viajaba está relacionado inversamente con la cantidad de personas que sobrevivieron o no.</p>
+<p>Ahora vamos a proseguir con una inspección gráfica de las variables cuantitativas, que son la <strong>Edad (AGE)</strong> y la <strong>Tarifa (Fare)</strong></p>
+<pre class="r"><code>all %&gt;%
+  keep(is.numeric) %&gt;%
+  select(Age, Fare) %&gt;%
+  gather() %&gt;%
+  ggplot(aes(x = value, fill = &quot;red&quot;)) + 
+  facet_wrap(~key, scales = &quot;free&quot;) +
+  geom_density()</code></pre>
+<p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>Podemos ver por ejemplo que la edad tiene una distribución casi normal con un sezgo positivo, adicionalmente observamos que la tarifa está sezgada hacia la derecha. También que las variables tienen algunos datos atípicos principalmente la variable <strong><em>fare</em></strong>, esto quiere decir que hay pocas personas que pagaron una tarifa más elevada que los demás pasajeros.</p>
+<pre class="r"><code>all %&gt;%
+  keep(is.numeric) %&gt;%
+  select(Age, Fare, Pclass) %&gt;%
+  mutate(Age = scale(Age),
+         Fare = scale(Fare)) %&gt;%
+  gather(key = &quot;key&quot;, value = &quot;value&quot;, -Pclass) %&gt;%
+  ggplot(aes(x= value, fill = factor(Pclass))) +
+  geom_density(aes(alpha = 0.5)) +
+  facet_wrap(~key, scales = &quot;free&quot;)  +
+  theme_classic()</code></pre>
+<p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>Podemos observar que la variable edad tiene un comportamiento casi normal pero hay diferencias significativas respecto a la edad y la clase en la que viajaban los pasajeros. Por ejemplo en primera clase hay una menor densidad de pasajeros y tiene una pequeña joroba a la derecha lo que nos indica que hay más pasajeros de mayor edad en ésta clase. A diferencia de la segunda y tercera clase indicadas en los colores azúl y verde que tienen una joroba un poco más grande a la izquierda, lo que indica que hay un mayor número de pasajeros de corta edad. Osea En primera clase viajaban más personas adultas y en segunda y tercera clase viajaban más personas jóvenes.</p>
+<pre class="r"><code>train %&gt;%
+  keep(is.numeric) %&gt;%
+  select(Age, Fare, Pclass) %&gt;%
+  mutate(Age = scale(Age),
+         Fare = scale(Fare)) %&gt;%
+  gather(key = &quot;key&quot;, value = &quot;value&quot;, -Pclass) %&gt;%
+  ggplot(aes(y=value, fill = factor(Pclass))) +
+  facet_wrap(~key, scales = &quot;free&quot;) +
+  geom_boxplot()+
+  theme_classic()</code></pre>
+<p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p>Las dos gráficas de caja y bigotes para las variables <strong>Age</strong> y <strong>Fare</strong> se observa que el ticket en primera clase es en promedio más alto que en las dos clases. En tercera clase tenemos algunos tickets que superan el promedio de primera clase. Así mismo observamos un dato importante, en promedio las personas viajando en primera clase son de mayor edad que las de segunda y tercera clase.</p>
+</div>
+<div id="estimacion-de-la-edad" class="section level1">
+<h1>Estimación de la edad</h1>
+<p>Observamos entonces que la variable edad es relevante para nuestro análisis, sin embargo tiene una cantidad significativa de valores perdidos por lo que utilizamos una regresión lineal simple para tratar de estimar la edad del pasajero del que no contamos con la edad.</p>
+<pre class="r"><code>EdadLM &lt;- lm(Age ~ pr + title + Fsize + Survived + Fare, data = all[!is.na(all$Age), ])
+summary(EdadLM)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Age ~ pr + title + Fsize + Survived + Fare, data = all[!is.na(all$Age), 
+##     ])
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -26.926  -8.119  -1.060   6.061  43.879 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      29.98934    3.65451   8.206 1.09e-15 ***
+## prP1Male         -3.86822    1.97941  -1.954 0.051071 .  
+## prP2Female       -8.10263    1.99800  -4.055 5.57e-05 ***
+## prP2Male        -14.67654    2.24658  -6.533 1.24e-10 ***
+## prP3Female      -12.83584    2.04279  -6.283 5.81e-10 ***
+## prP3Male        -18.10048    2.10272  -8.608  &lt; 2e-16 ***
+## titleMiss         6.30098    2.81230   2.241 0.025370 *  
+## titleMr          19.74473    2.32996   8.474  &lt; 2e-16 ***
+## titlerate_title  27.75415    3.44918   8.047 3.63e-15 ***
+## Fsize            -1.42822    0.35246  -4.052 5.64e-05 ***
+## Survived         -4.16319    1.15837  -3.594 0.000348 ***
+## Fare             -0.01090    0.01067  -1.021 0.307711    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 11.14 on 702 degrees of freedom
+##   (332 observations deleted due to missingness)
+## Multiple R-squared:  0.4207, Adjusted R-squared:  0.4116 
+## F-statistic: 46.34 on 11 and 702 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>all$ageLM &lt;- predict(EdadLM, all)</code></pre>
+</div>
