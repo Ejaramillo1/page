@@ -53,7 +53,11 @@ all &amp;lt;- rbind(train, test)&lt;/code&gt;&lt;/pre&gt;
 ##           0         418           0           0           0         263 
 ##       SibSp       Parch      Ticket        Fare       Cabin    Embarked 
 ##           0           0           0           1        1014           2&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Según el conteo, las variables que tienen más valores perdidos son &lt;strong&gt;&lt;em&gt;Age&lt;/em&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;em&gt;Cabin&lt;/em&gt;&lt;/strong&gt; y &lt;strong&gt;&lt;em&gt;Embarked&lt;/em&gt;&lt;/strong&gt;. Confirmamos esto de manera gráfica con una función que nos ayuda a visualizar los valores perdidos de mejor manera. # Explorando algunas de las variables más importantes Confirmamos con una función a la medida y de manera gráfica los valores perdidos en las variables.&lt;/p&gt;
+&lt;p&gt;Según el conteo, las variables que tienen más valores perdidos son &lt;strong&gt;&lt;em&gt;Age&lt;/em&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;em&gt;Cabin&lt;/em&gt;&lt;/strong&gt; y &lt;strong&gt;&lt;em&gt;Embarked&lt;/em&gt;&lt;/strong&gt;. Confirmamos esto de manera gráfica con una función que nos ayuda a visualizar los valores perdidos de mejor manera.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;explorando-algunas-de-las-variables-mas-importantes&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Explorando algunas de las variables más importantes&lt;/h2&gt;
+&lt;p&gt;Confirmamos con una función a la medida y de manera gráfica los valores perdidos en las variables.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot_Missing &amp;lt;- function(data_in, title = NULL){
   temp_df &amp;lt;- as.data.frame(ifelse(is.na(data_in), 0, 1))
   temp_df &amp;lt;- temp_df[,order(colSums(temp_df))]
@@ -68,7 +72,11 @@ all &amp;lt;- rbind(train, test)&lt;/code&gt;&lt;/pre&gt;
 
 plot_Missing(all)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;Las variables con mayor número de valores perdidos son la edad, la cabina y el lugar en el que se embarcaron, por otro lado, la variable &lt;strong&gt;Survived&lt;/strong&gt; muestra una gran cantidad de valores perdidos, esto se da principalmente porque unimos la tabla de datos de entrenamiento y de modelado. ## Exploración de la variable respuesta: Survived Iniciamos la exploración de la tabla de datos analizando el comportamiento de la variable respuesta, en este caso de trata de una variable dicotómica que indica si la persona en cuestión sobrevivió o no.&lt;/p&gt;
+&lt;p&gt;Las variables con mayor número de valores perdidos son la edad, la cabina y el lugar en el que se embarcaron, por otro lado, la variable &lt;strong&gt;Survived&lt;/strong&gt; muestra una gran cantidad de valores perdidos, esto se da principalmente porque unimos la tabla de datos de entrenamiento y de modelado.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;exploracion-de-la-variable-respuesta-survived&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Exploración de la variable respuesta: Survived&lt;/h2&gt;
+&lt;p&gt;Iniciamos la exploración de la tabla de datos analizando el comportamiento de la variable respuesta, en este caso de trata de una variable dicotómica que indica si la persona en cuestión sobrevivió o no.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;all %&amp;gt;%
   select(Sex, Survived, Pclass) %&amp;gt;%
   filter(!is.na(Survived)) %&amp;gt;%
@@ -258,9 +266,8 @@ unique(all$title)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] Mr         Mrs        Master     rare_title
 ## Levels: Master Mr Mrs rare_title&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;/div&gt;
-&lt;div id=&#34;el-tamano-de-la-familia&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;El tamaño de la familia&lt;/h1&gt;
+&lt;div id=&#34;el-tamano-de-la-familia&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;El tamaño de la familia&lt;/h2&gt;
 &lt;p&gt;El tamaño de la familia también es una variable que importa segun algunos analistas que ya han explorado esta base de datos, por lo que se creará una variable para estimar el tamaño de la familia con la que viajaban los pasajeros.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;all &amp;lt;- all %&amp;gt;%
   mutate(Fsize = SibSp+Parch + 1)&lt;/code&gt;&lt;/pre&gt;
@@ -308,6 +315,7 @@ unique(all$title)&lt;/code&gt;&lt;/pre&gt;
   theme_classic()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Las dos gráficas de caja y bigotes para las variables &lt;strong&gt;Age&lt;/strong&gt; y &lt;strong&gt;Fare&lt;/strong&gt; se observa que el ticket en primera clase es en promedio más alto que en las dos clases. En tercera clase tenemos algunos tickets que superan el promedio de primera clase. Así mismo observamos un dato importante, en promedio las personas viajando en primera clase son de mayor edad que las de segunda y tercera clase.&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;estimacion-de-la-edad&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Estimación de la edad&lt;/h1&gt;

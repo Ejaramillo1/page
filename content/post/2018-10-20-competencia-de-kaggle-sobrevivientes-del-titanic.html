@@ -54,7 +54,11 @@ all &lt;- rbind(train, test)</code></pre>
 ##           0         418           0           0           0         263 
 ##       SibSp       Parch      Ticket        Fare       Cabin    Embarked 
 ##           0           0           0           1        1014           2</code></pre>
-<p>Según el conteo, las variables que tienen más valores perdidos son <strong><em>Age</em></strong>, <strong><em>Cabin</em></strong> y <strong><em>Embarked</em></strong>. Confirmamos esto de manera gráfica con una función que nos ayuda a visualizar los valores perdidos de mejor manera. # Explorando algunas de las variables más importantes Confirmamos con una función a la medida y de manera gráfica los valores perdidos en las variables.</p>
+<p>Según el conteo, las variables que tienen más valores perdidos son <strong><em>Age</em></strong>, <strong><em>Cabin</em></strong> y <strong><em>Embarked</em></strong>. Confirmamos esto de manera gráfica con una función que nos ayuda a visualizar los valores perdidos de mejor manera.</p>
+</div>
+<div id="explorando-algunas-de-las-variables-mas-importantes" class="section level2">
+<h2>Explorando algunas de las variables más importantes</h2>
+<p>Confirmamos con una función a la medida y de manera gráfica los valores perdidos en las variables.</p>
 <pre class="r"><code>plot_Missing &lt;- function(data_in, title = NULL){
   temp_df &lt;- as.data.frame(ifelse(is.na(data_in), 0, 1))
   temp_df &lt;- temp_df[,order(colSums(temp_df))]
@@ -69,7 +73,11 @@ all &lt;- rbind(train, test)</code></pre>
 
 plot_Missing(all)</code></pre>
 <p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<p>Las variables con mayor número de valores perdidos son la edad, la cabina y el lugar en el que se embarcaron, por otro lado, la variable <strong>Survived</strong> muestra una gran cantidad de valores perdidos, esto se da principalmente porque unimos la tabla de datos de entrenamiento y de modelado. ## Exploración de la variable respuesta: Survived Iniciamos la exploración de la tabla de datos analizando el comportamiento de la variable respuesta, en este caso de trata de una variable dicotómica que indica si la persona en cuestión sobrevivió o no.</p>
+<p>Las variables con mayor número de valores perdidos son la edad, la cabina y el lugar en el que se embarcaron, por otro lado, la variable <strong>Survived</strong> muestra una gran cantidad de valores perdidos, esto se da principalmente porque unimos la tabla de datos de entrenamiento y de modelado.</p>
+</div>
+<div id="exploracion-de-la-variable-respuesta-survived" class="section level2">
+<h2>Exploración de la variable respuesta: Survived</h2>
+<p>Iniciamos la exploración de la tabla de datos analizando el comportamiento de la variable respuesta, en este caso de trata de una variable dicotómica que indica si la persona en cuestión sobrevivió o no.</p>
 <pre class="r"><code>all %&gt;%
   select(Sex, Survived, Pclass) %&gt;%
   filter(!is.na(Survived)) %&gt;%
@@ -259,9 +267,8 @@ unique(all$title)</code></pre>
 <pre><code>## [1] Mr         Mrs        Master     rare_title
 ## Levels: Master Mr Mrs rare_title</code></pre>
 </div>
-</div>
-<div id="el-tamano-de-la-familia" class="section level1">
-<h1>El tamaño de la familia</h1>
+<div id="el-tamano-de-la-familia" class="section level2">
+<h2>El tamaño de la familia</h2>
 <p>El tamaño de la familia también es una variable que importa segun algunos analistas que ya han explorado esta base de datos, por lo que se creará una variable para estimar el tamaño de la familia con la que viajaban los pasajeros.</p>
 <pre class="r"><code>all &lt;- all %&gt;%
   mutate(Fsize = SibSp+Parch + 1)</code></pre>
@@ -309,6 +316,7 @@ unique(all$title)</code></pre>
   theme_classic()</code></pre>
 <p><img src="/post/2018-10-20-competencia-de-kaggle-sobrevivientes-del-titanic_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 <p>Las dos gráficas de caja y bigotes para las variables <strong>Age</strong> y <strong>Fare</strong> se observa que el ticket en primera clase es en promedio más alto que en las dos clases. En tercera clase tenemos algunos tickets que superan el promedio de primera clase. Así mismo observamos un dato importante, en promedio las personas viajando en primera clase son de mayor edad que las de segunda y tercera clase.</p>
+</div>
 </div>
 <div id="estimacion-de-la-edad" class="section level1">
 <h1>Estimación de la edad</h1>

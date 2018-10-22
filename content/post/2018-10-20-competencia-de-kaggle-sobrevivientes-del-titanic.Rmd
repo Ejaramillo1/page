@@ -72,7 +72,9 @@ sapply(all, function(x){sum(is.na(x))})
 
 
 Según el conteo, las variables que tienen más valores perdidos son **_Age_**, **_Cabin_** y **_Embarked_**. Confirmamos esto de manera gráfica con una función que nos ayuda a visualizar los valores perdidos de mejor manera. 
-# Explorando algunas de las variables más importantes
+
+## Explorando algunas de las variables más importantes
+
 Confirmamos con una función a la medida y de manera gráfica los valores perdidos en las variables.
 
 ```{r warning=FALSE, message=FALSE}
@@ -95,7 +97,9 @@ plot_Missing(all)
 ```
 
 Las variables con mayor número de valores perdidos son la edad, la cabina y el lugar en el que se embarcaron, por otro lado, la variable **Survived** muestra una gran cantidad de valores perdidos, esto se da principalmente porque unimos la tabla de datos de entrenamiento y de modelado.
+
 ## Exploración de la variable respuesta: Survived
+
 Iniciamos la exploración de la tabla de datos analizando el comportamiento de la variable respuesta, en este caso de trata de una variable dicotómica que indica si la persona en cuestión sobrevivió o no.
 
 ```{r warning=FALSE, message=FALSE}
@@ -264,7 +268,7 @@ unique(all$title)
  
 ```
 
-# El tamaño de la familia
+## El tamaño de la familia
 
 El tamaño de la familia también es una variable que importa segun algunos analistas que ya han explorado esta base de datos, por lo que se creará una variable para estimar el tamaño de la familia con la que viajaban los pasajeros. 
 
