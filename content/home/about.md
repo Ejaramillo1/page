@@ -17,6 +17,12 @@ weight = 5
 
 # List your qualifications (such as academic degrees).
 [[education.courses]]
+ course= "MIT SA+P Commercial Real Estate Annalysis and Investment"
+ institution = "Online campus"
+ year = 2018
+
+
+[[education.courses]]
   course = "Master's degree in Economic Sciences"
   institution = "Universidad Autónoma de Baja California"
   year = 2017
