@@ -17,7 +17,7 @@ weight = 5
 
 # List your qualifications (such as academic degrees).
 [[education.courses]]
-  course = "Master in Economic Sciences"
+  course = "Master's degree in Economic Sciences"
   institution = "Universidad Autónoma de Baja California"
   year = 2017
 
@@ -30,8 +30,4 @@ weight = 5
 
 # Biography
 
-Eduardo Jaramillo currently marketing intelligence analyst in the marketing branch of ATISA GROUP called Company by Peple. The company main activity is building properties for industrial usage in the manufacturing and logistics industry. 
-
-During its bachelors degree in Economics Eduardo won the National Presentation Competition of the National Association of Economics Students. 
-
-He was recognized with the academic merit award of his masters degree school generation. 
+Eduardo Jaramillo is Atisa Group’s Marketing Intelligence Analyst. The company’s main branch, Atisa Industrial, develops properties for industrial use in the manufacturing and logistics sector. With a bachelors degree in Economics, Eduardo won the National Association of Economics Students’ National Presentation Competition. He was granted the Academic Merit Award for his generation’s Masters Degree.
