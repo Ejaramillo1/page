@@ -1,13 +1,14 @@
 ---
-title: Agrupación por clusters del sector manufacturero en Tijuana.
-author: J. Eduardo Jaramillo Barrera
+title: "Agrupación por clusters del sector manufacturero en Tijuana."
+author: "J. Eduardo Jaramillo Barrera"
 date: '2018-05-21'
-slug: tijuana-industrial-structure
-categories: []
-tags: []
+output: pdf_document
 header:
   caption: ''
   image: ''
+slug: tijuana-industrial-structure
+tags: []
+categories: []
 ---
 
 Este es el primer blog de una serie de post donde se analizará la estructura industrial en la ciudad de Tijuana. 

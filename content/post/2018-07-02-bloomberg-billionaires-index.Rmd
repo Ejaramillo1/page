@@ -2,6 +2,7 @@
 title: "NOMAS POR CURA"
 author: "J. Eduardo Jaramillo"
 date: '2018-07-02'
+output: pdf_document
 header:
   caption: ''
   image: ''
@@ -24,7 +25,7 @@ Comenzamos primero por subir los paquetes de funciones que nos van a ayudar en e
 ```{r message=FALSE, warning=FALSE}
 
 library(easypackages)
-my_packages <- c("rvest", "tidyverse", "rgeos", "sf", "ggmap", "mapview", "readr", "knitr", "ggrepel", "kableExtra")
+my_packages <- c( "sf", "rvest", "tidyverse", "rgeos", "ggmap", "mapview", "readr", "knitr", "ggrepel", "kableExtra")
 libraries(my_packages)
 
 ```
@@ -41,10 +42,16 @@ Comenzamos el archi-reconocido _**copy-paste**_ indicando el **_url_** de donde 
 ```{r message=FALSE}
 
 url <- "https://www.bloomberg.com/billionaires/"
+webpage <- read_html(url)
 
-position <- read_html(url) %>% #Aquí le dices a la compu de donde jalar la info
-  html_nodes(".t-rank") %>% #Aquí le dices a la compu que columna jalar
+position <- read_html(url) %>%  #Aquí le dices a la compu de donde jalar la info
+  html_nodes(".table-row")  #Aquí le dices a la compu que columna jalar
   html_text() #Adivina que hace esto(La pone todo como texto y le quita un montón de carácteres que no sirven)
+
+
+data <- html_nodes(webpage, ".t-rank")
+
+
 
 position <- position[(-1)]
 
