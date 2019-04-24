@@ -36,4 +36,4 @@ weight = 5
 
 # Biography
 
-Eduardo Jaramillo is Atisa Group’s Marketing Intelligence Analyst. The company’s main branch, Atisa Industrial, develops properties for industrial use in the manufacturing and logistics sector. With a bachelors degree in Economics, Eduardo won the National Association of Economics Students’ National Presentation Competition. He was granted the Academic Merit Award for his generation’s Masters Degree.
+Eduardo Jaramillo is a Data Analyst with experience in sectors such as Commercial Real Estate, Enterpreneurship, Gas & Oil among others. I hold a bachelors degree in Economics, and I win the National Association of Economics Students’ National Presentation Competition. I was granted the Academic Merit Award for his generation’s Masters Degree in Economics. 
