@@ -43,7 +43,7 @@ test <- read_csv("C:/Users/ejaramillo/Documents/titanic_competition_kaggle/test.
 
 ```
 
-Para no tener que hacer el proceso de limpieza dos veces vamos a unir las bases de datos traen and test, así tendremos las dos tablas con los datos normalizados al momento de la estimación.
+Para no tener que hacer el proceso de limpieza dos veces vamos a unir las bases de datos train and test, así tendremos las dos tablas con los datos normalizados al momento de la estimación.
 
 ```{r}
 
@@ -62,6 +62,7 @@ glimpse(all)
 ```
 
 Como podemos ver arriba, en nuestra tabla de datos está compuesta por doce variables de las cuales **Fare**, **Age** y **PassengerId** son variables numéricas, las restantes 9 variables más son categóricas sin embargo la variable **Pclass** se leyó como o variable numérica por lo que debemos recodificar como variable de tipo factor para obtener resultados satisfactorios. 
+
 Una de las tareas principales al realizar análisis estadístico es conocer la base de datos y las relaciones entre las variables, así como conocer los valores perdidos. Para esto aplicaremos una función que nos ayudará a contar los valores perdidos en cada una de las columnas en nuestra tabla de datos.
 
 ```{r warning=FALSE, message=FALSE}
