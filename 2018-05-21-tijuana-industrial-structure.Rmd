@@ -24,7 +24,7 @@ El trabajo de análisis se inicia llamando los paquetes de funciones
 ```{r message=FALSE}
 
 library(easypackages)
-my_packages <- c("tidyverse", "readxl", "lubridate", "geosphere", "scales", "sf", "ggmap")
+my_packages <- c("tidyverse", "readxl", "lubridate", "scales", "sf", "OpenStreetMap")
 libraries(my_packages)
 
 

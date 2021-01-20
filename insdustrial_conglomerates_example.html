@@ -1,0 +1,580 @@
+---
+title: "Principales conglomerados en el sector -SECTOR QUE LES TOCO"
+author: "Eduardo Jaramillo"
+date: "3/30/2020"
+output: pdf_document
+---
+
+<link href="/rmarkdown-libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/anchor-sections/anchor-sections.js"></script>
+
+
+<div id="introducción" class="section level1">
+<h1>Introducción</h1>
+<ul>
+<li><ol style="list-style-type: lower-alpha">
+<li>Planteamiento del problema</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: lower-alpha">
+<li>Objetivo del proyecto</li>
+</ol></li>
+</ul>
+</div>
+<div id="justificación" class="section level1">
+<h1>Justificación</h1>
+<p>Por qué quiero hacer esto?</p>
+</div>
+<div id="objetivos" class="section level1">
+<h1>Objetivos</h1>
+<p>Qué quiero lograr?</p>
+</div>
+<div id="marco-metodológico" class="section level1">
+<h1>Marco metodológico</h1>
+<p>Qué técnicas de análisis usé?</p>
+</div>
+<div id="descripción-de-las-fuentes-de-datos" class="section level1">
+<h1>Descripción de las fuentes de datos</h1>
+<p>Cuales fueron mis fuentes de datos?</p>
+</div>
+<div id="descripción-de-los-paquetes-de-funciones-usados" class="section level1">
+<h1>Descripción de los paquetes de funciones usados</h1>
+<p>Que paquete de funciones de R usé?</p>
+<pre class="r"><code>library(easypackages)
+
+my_packages &lt;- c(&quot;tidyverse&quot;, &quot;lubridate&quot;, &quot;readxl&quot;, &quot;sf&quot;, &quot;OpenStreetMap&quot;)
+
+libraries(my_packages)</code></pre>
+<pre><code>## Loading required package: tidyverse</code></pre>
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.0 --</code></pre>
+<pre><code>## v ggplot2 3.3.2     v purrr   0.3.4
+## v tibble  3.0.4     v dplyr   1.0.2
+## v tidyr   1.1.2     v stringr 1.4.0
+## v readr   1.4.0     v forcats 0.5.0</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre><code>## Loading required package: lubridate</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<pre><code>## Loading required package: readxl</code></pre>
+<pre><code>## Loading required package: sf</code></pre>
+<pre><code>## Linking to GEOS 3.8.0, GDAL 3.0.4, PROJ 6.3.1</code></pre>
+<pre><code>## Loading required package: OpenStreetMap</code></pre>
+<pre><code>## All packages loaded successfully</code></pre>
+</div>
+<div id="análisis-exploratorio-de-datos" class="section level1">
+<h1>Análisis exploratorio de datos</h1>
+<pre class="r"><code>data &lt;- read_csv(&quot;denue_inegi_02_.csv&quot;, guess_max = 1000000)</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   .default = col_character(),
+##   id = col_double(),
+##   codigo_act = col_double(),
+##   numero_ext = col_double(),
+##   cod_postal = col_double(),
+##   latitud = col_double(),
+##   longitud = col_double()
+## )
+## i Use `spec()` for the full column specifications.</code></pre>
+<pre class="r"><code>db &lt;- data %&gt;%
+  select(id, per_ocu, nombre_act, entidad, municipio, ageb, latitud, longitud, fecha_alta, codigo_act) %&gt;%
+  mutate(code = str_extract(string = as.character(codigo_act), pattern = &quot;(\\d\\d)&quot;),
+         y = latitud,
+         x = longitud,
+         codigo_act = as.character(codigo_act)) %&gt;%
+  filter(municipio %in% c(&quot;Tijuana&quot;) &amp; code %in% c(&quot;46&quot;) &amp; per_ocu %in% c(&quot;6 a 10 personas&quot;)) %&gt;%
+  distinct(id, .keep_all = TRUE)</code></pre>
+<pre class="r"><code>db %&gt;%
+  mutate(sector = str_extract(string = codigo_act, pattern = &quot;(\\d\\d\\d)&quot;)) %&gt;%
+  group_by(sector) %&gt;%
+  summarise(n = n()) %&gt;% 
+  mutate(sector = fct_recode(sector, 
+                             &quot;Industria Alimentaria&quot; = &quot;311&quot;,
+                             &quot;Industria de las bebidas y tabaco&quot; = &quot;312&quot;,
+                             &quot;Frabicación de insumos de textiles y acabados de textiles&quot; = &quot;313&quot;,
+                             &quot;Fabricación de productos textiles excepto prendas de vestir&quot; = &quot;314&quot;,
+                             &quot;Fabricación de prendas de vestir&quot; = &quot;315&quot;,
+                             &quot;Curtido y acabado de cuero y piel, fabricación de productos de cuero, piel y materiales sucedánios&quot; = &quot;316&quot;,
+                             &quot;Industria de la madera&quot; = &quot;321&quot;,
+                             &quot;Industria de papel&quot; = &quot;322&quot;,
+                             &quot;Impresión e industrias conexas&quot; = &quot;323&quot;,
+                             &quot;Fabricación de productos derivados del petroleo y del carbón&quot; = &quot;324&quot;,
+                             &quot;Industria quimica&quot; = &quot;325&quot; ,
+                             &quot;Industria del plástico y del hule&quot; = &quot;326&quot;,
+                             &quot;Fabricación de productos a base de minerales no metálicos&quot; = &quot;327&quot;,
+                             &quot;Industrias metálicas básicas&quot; = &quot;328&quot;,
+                             &quot; Fabricación de productos metálicos&quot; = &quot;332&quot;,
+                             &quot;Fabricación de maquinaria y equipo&quot; = &quot;333&quot;,
+                             &quot;Fabricación de equipo de computación, comunicación, medición y de otros equipos, componentes y accesorios electrónicos&quot; = &quot;334&quot;,
+                             &quot;Fabricación de accesorios, aparatos eléctricos y equipo de generación de energía eléctrica&quot; = &quot;335&quot;,
+                             &quot;Fabricación de equipo de transporte&quot; = &quot;336&quot;,
+                             &quot;Fabricación de muebles, colchones y persianas&quot; = &quot;337&quot;,
+                             &quot;Otras industrias manufactureras&quot; = &quot;339&quot;, )) %&gt;%
+  ggplot(aes(x = reorder(sector, n), y = n, fill = factor(n))) + 
+  geom_bar(stat = &quot;identity&quot;) + 
+  coord_flip() + 
+  ggtitle(&quot;Numero de empresas en Industria Manufacturera en Tijuana&quot;) + 
+  xlab(&quot;&quot;) + 
+  ylab(&quot;Número de empresas&quot;) +
+  theme_minimal() + 
+  theme(legend.position = &quot;none&quot;) </code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## Warning: Problem with `mutate()` input `sector`.
+## i Unknown levels in `f`: 311, 312, 313, 314, 315, 316, 321, 322, 323, 324, 325, 326, 327, 328, 332, 333, 334, 335, 336, 337, 339
+## i Input `sector` is `fct_recode(...)`.</code></pre>
+<pre><code>## Warning: Unknown levels in `f`: 311, 312, 313, 314, 315, 316, 321, 322, 323,
+## 324, 325, 326, 327, 328, 332, 333, 334, 335, 336, 337, 339</code></pre>
+<p><img src="./insdustrial_conglomerates_example_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<div id="cantidad-de-empresas-por-personal-ocupado-en-comercio-al-mayoreo" class="section level2">
+<h2>CANTIDAD DE EMPRESAS POR PERSONAL OCUPADO EN COMERCIO AL MAYOREO</h2>
+<p>COSAS</p>
+<pre class="r"><code>db %&gt;%
+  mutate(codigo_act = as.character(codigo_act)) %&gt;%
+  filter(codigo_act %in% c(&quot;311&quot;,&quot;312&quot;, &quot;313&quot;, &quot;314&quot;, &quot;315&quot;,&quot;316&quot;,&quot;321&quot;, &quot;322&quot;, &quot;323&quot;, &quot;324&quot;,&quot;325&quot;, &quot;326&quot;, &quot;327&quot;, &quot;331&quot;, &quot;332&quot;, &quot;333&quot;, &quot;334&quot;, &quot;335&quot;, &quot;336&quot;, &quot;337&quot;, &quot;339&quot;)) %&gt;%
+  group_by(codigo_act) %&gt;%
+  summarise(n = n()) %&gt;%
+  ggplot(aes(x = reorder(codigo_act, n), y = n, fill = factor(n))) + 
+  geom_bar(stat = &quot;identity&quot;) + 
+  coord_flip() + 
+  ggtitle(&quot;Numero de empresas en comercio al menudeo en Tijuana&quot;) + 
+  xlab(&quot;&quot;) + 
+  ylab(&quot;Número de empresas&quot;) +
+  theme_minimal() + 
+  theme(legend.position = &quot;none&quot;) </code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<p><img src="./insdustrial_conglomerates_example_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="cantidad-de-empresas-por-personal-ocupado-en-sector-manufacturero" class="section level2">
+<h2>CANTIDAD DE EMPRESAS POR PERSONAL OCUPADO EN SECTOR MANUFACTURERO</h2>
+<pre class="r"><code>db %&gt;%
+  mutate(sector = str_extract(string = codigo_act, pattern = &quot;(\\d\\d)&quot;)) %&gt;%
+  filter(sector %in% c(&quot;31&quot;, &quot;32&quot;, &quot;33&quot;)) %&gt;%
+  group_by(sector, per_ocu) %&gt;%
+  summarise(emp_tot = n()) %&gt;%
+  ggplot() +
+  geom_bar(aes(x = reorder(per_ocu, emp_tot), y = emp_tot, fill = sector), 
+           stat = &quot;identity&quot;, position = &quot;dodge&quot;) +
+  coord_flip() +
+  ggtitle(&quot;Total empresas por personal la industria manufacturera&quot;) + 
+  xlab(label = &quot;&quot;) + 
+  ylab(label = &quot;&quot;) + 
+  theme_minimal()</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;sector&#39; (override with `.groups` argument)</code></pre>
+<p><img src="./insdustrial_conglomerates_example_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="cantidad-de-empresas-por-personal-ocupado-en-sector-manufacturero-1" class="section level2">
+<h2>CANTIDAD DE EMPRESAS POR PERSONAL OCUPADO EN SECTOR MANUFACTURERO</h2>
+<pre class="r"><code>db %&gt;%
+  mutate(sector = str_extract(string = codigo_act, pattern = &quot;(\\d\\d)&quot;)) %&gt;%
+  filter(sector %in% c(&quot;31&quot;, &quot;32&quot;, &quot;33&quot;)) %&gt;%
+  group_by(sector, per_ocu) %&gt;%
+  summarise(emp_tot = n()) %&gt;%
+  ggplot(aes(x = reorder(per_ocu, emp_tot), y = emp_tot, fill = factor(sector))) +
+  geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) +
+  geom_text(aes(label = emp_tot), size = 3.5, position=position_dodge(width=0.9), vjust=-0.20) +
+  coord_flip() +
+  ggtitle(&quot;Total empresas por personal la industria manufacturera&quot;) + 
+  xlab(label = &quot;&quot;) + 
+  ylab(label = &quot;&quot;) + 
+  theme_minimal()</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;sector&#39; (override with `.groups` argument)</code></pre>
+<p><img src="./insdustrial_conglomerates_example_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+</div>
+<div id="analisis-de-conglomerados" class="section level1">
+<h1>ANALISIS DE CONGLOMERADOS</h1>
+<p>Convertimos la tabla de datos a un objeto geoespacial</p>
+<pre class="r"><code>map_dta &lt;- db %&gt;%
+  mutate(sector = str_extract(string = codigo_act, pattern = &quot;(\\d\\d)&quot;)) 
+
+
+denue_sf &lt;- st_as_sf(map_dta, coords = c(&quot;x&quot;, &quot;y&quot;), crs = &quot;+proj=longlat +ellps=WGS84 +datum=WGS84&quot;)
+
+plot(denue_sf)</code></pre>
+<pre><code>## Warning: plotting the first 9 out of 12 attributes; use max.plot = 12 to plot
+## all</code></pre>
+<p><img src="./insdustrial_conglomerates_example_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code># GET PROJECTION
+
+crs &lt;- st_crs(denue_sf)
+
+tj_map &lt;- openmap(upperLeft = c(32.363723,-117.190132), 
+                  lowerRight = c(32.590503,-116.640816),
+                  type = &quot;osm&quot;)</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj
+## = prefer_proj): Discarded ellps WGS 84 in CRS definition: +proj=merc +a=6378137
+## +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null
+## +wktext +no_defs +type=crs</code></pre>
+<pre><code>## Warning in showSRID(uprojargs, format = &quot;PROJ&quot;, multiline = &quot;NO&quot;, prefer_proj =
+## prefer_proj): Discarded datum World Geodetic System 1984 in CRS definition</code></pre>
+<pre class="r"><code># REPROJECT THE MAP ACCORDING TO OUR POLYGONS
+
+map.latlon &lt;- openproj(tj_map, projection = crs$proj4string)</code></pre>
+</div>
+<div id="crea-los-clusters" class="section level1">
+<h1>Crea los clusters</h1>
+<pre class="r"><code>mdist &lt;- st_distance(denue_sf)
+
+
+hc &lt;- hclust(as.dist(mdist), method = &quot;complete&quot;)
+
+d = 9000
+
+denue_sf$clust &lt;- cutree(hc, h = d)</code></pre>
+</div>
+<div id="presentamos-analisis-de-cluster-geoespacial" class="section level1">
+<h1>PRESENTAMOS ANALISIS DE CLUSTER GEOESPACIAL</h1>
+<p>A;LKSF;LASJDFL;KJAS;LKDFJA;LSKJF</p>
+<pre class="r"><code>autoplot.OpenStreetMap(map.latlon) +
+  geom_sf(data = denue_sf, inherit.aes = FALSE, mapping = aes(fill = clust))</code></pre>
+<pre><code>## Coordinate system already present. Adding new coordinate system, which will replace the existing one.</code></pre>
+<p><img src="./insdustrial_conglomerates_example_files/figure-html/unnamed-chunk-10-1.png" width="100%" height="100%" /></p>
+<pre class="r"><code>  geom_polygon(data = denue_sf, aes(x = longitud, y = latitud), inherit.aes = FALSE)</code></pre>
+<pre><code>## mapping: x = ~longitud, y = ~latitud 
+## geom_polygon: na.rm = FALSE, rule = evenodd
+## stat_identity: na.rm = FALSE
+## position_identity</code></pre>
+<pre class="r"><code>  theme(axis.text.x = element_text(color = &quot;#383838&quot;),
+        axis.text.y = element_text(color = &quot;#383838&quot;),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.text = element_text(colour = &quot;#383838&quot;),
+        legend.title = element_text(colour = &quot;#383838&quot;),
+        legend.key = element_rect(colour = NA, fill = NA),
+        legend.key.size = unit(1, &quot;line&quot;),
+        legend.background = element_blank(),
+        panel.grid.major = element_line(color = &quot;#C0C0C0&quot;),
+        plot.title = element_text(vjust= 2.12, 
+                                  colour=&quot;#5bb950&quot;,
+                                  face=&quot;bold&quot;),
+        plot.caption = element_text(color = &quot;#383838&quot;),
+        plot.subtitle = element_text(color = &quot;#f6901e&quot;, face = &quot;bold.italic&quot;)) + 
+  guides(col = guide_legend(nrow = 16, byrow = TRUE))</code></pre>
+<pre><code>## List of 14
+##  $ axis.title.x     : list()
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_blank&quot; &quot;element&quot;
+##  $ axis.title.y     : list()
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_blank&quot; &quot;element&quot;
+##  $ axis.text.x      :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : chr &quot;#383838&quot;
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ axis.text.y      :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : chr &quot;#383838&quot;
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ legend.background: list()
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_blank&quot; &quot;element&quot;
+##  $ legend.key       :List of 5
+##   ..$ fill         : logi NA
+##   ..$ colour       : logi NA
+##   ..$ size         : NULL
+##   ..$ linetype     : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_rect&quot; &quot;element&quot;
+##  $ legend.key.size  : &#39;simpleUnit&#39; num 1lines
+##   ..- attr(*, &quot;unit&quot;)= int 3
+##  $ legend.text      :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : chr &quot;#383838&quot;
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ legend.title     :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : chr &quot;#383838&quot;
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ panel.grid.major :List of 6
+##   ..$ colour       : chr &quot;#C0C0C0&quot;
+##   ..$ size         : NULL
+##   ..$ linetype     : NULL
+##   ..$ lineend      : NULL
+##   ..$ arrow        : logi FALSE
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_line&quot; &quot;element&quot;
+##  $ plot.title       :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : chr &quot;bold&quot;
+##   ..$ colour       : chr &quot;#5bb950&quot;
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : num 2.12
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ plot.subtitle    :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : chr &quot;bold.italic&quot;
+##   ..$ colour       : chr &quot;#f6901e&quot;
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ plot.caption     :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : chr &quot;#383838&quot;
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ colour           :List of 21
+##   ..$ title         : list()
+##   .. ..- attr(*, &quot;class&quot;)= chr &quot;waiver&quot;
+##   ..$ title.position: NULL
+##   ..$ title.theme   : NULL
+##   ..$ title.hjust   : NULL
+##   ..$ title.vjust   : NULL
+##   ..$ label         : logi TRUE
+##   ..$ label.position: NULL
+##   ..$ label.theme   : NULL
+##   ..$ label.hjust   : NULL
+##   ..$ label.vjust   : NULL
+##   ..$ keywidth      : NULL
+##   ..$ keyheight     : NULL
+##   ..$ direction     : NULL
+##   ..$ override.aes  : Named list()
+##   ..$ nrow          : num 16
+##   ..$ ncol          : NULL
+##   ..$ byrow         : logi TRUE
+##   ..$ reverse       : logi FALSE
+##   ..$ order         : num 0
+##   ..$ available_aes : chr &quot;any&quot;
+##   ..$ name          : chr &quot;legend&quot;
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;guide&quot; &quot;legend&quot;
+##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;theme&quot; &quot;gg&quot;
+##  - attr(*, &quot;complete&quot;)= logi FALSE
+##  - attr(*, &quot;validate&quot;)= logi TRUE</code></pre>
+</div>
+<div id="conclusiones" class="section level1">
+<h1>Conclusiones</h1>
+<p>Aqui van a poner las conclusiones</p>
+</div>
+<div id="fuentes-referencias" class="section level1">
+<h1>FUENTES / REFERENCIAS</h1>
+</div>

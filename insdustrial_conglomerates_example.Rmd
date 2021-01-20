@@ -1,0 +1,299 @@
+---
+title: "Principales conglomerados en el sector -SECTOR QUE LES TOCO"
+author: "Eduardo Jaramillo"
+date: "3/30/2020"
+output: pdf_document
+---
+
+# Introducción
+
+* a) Planteamiento del problema
+
+
+* b) Objetivo del proyecto
+
+
+# Justificación
+
+Por qué quiero hacer esto?
+
+
+# Objetivos
+
+Qué quiero lograr?
+
+
+# Marco metodológico
+
+Qué técnicas de análisis usé?
+
+
+
+# Descripción de las fuentes de datos
+
+Cuales fueron mis fuentes de datos?
+
+
+# Descripción de los paquetes de funciones usados
+
+Que paquete de funciones de R usé?
+
+
+```{r}
+
+library(easypackages)
+
+my_packages <- c("tidyverse", "lubridate", "readxl", "sf", "OpenStreetMap")
+
+libraries(my_packages)
+
+```
+
+
+
+
+# Análisis exploratorio de datos
+
+
+
+```{r}
+
+
+data <- read_csv("denue_inegi_02_.csv", guess_max = 1000000)
+
+
+db <- data %>%
+  select(id, per_ocu, nombre_act, entidad, municipio, ageb, latitud, longitud, fecha_alta, codigo_act) %>%
+  mutate(code = str_extract(string = as.character(codigo_act), pattern = "(\\d\\d)"),
+         y = latitud,
+         x = longitud,
+         codigo_act = as.character(codigo_act)) %>%
+  filter(municipio %in% c("Tijuana") & code %in% c("46") & per_ocu %in% c("6 a 10 personas")) %>%
+  distinct(id, .keep_all = TRUE)
+  
+  
+
+
+```
+
+
+
+```{r}
+
+
+db %>%
+  mutate(sector = str_extract(string = codigo_act, pattern = "(\\d\\d\\d)")) %>%
+  group_by(sector) %>%
+  summarise(n = n()) %>% 
+  mutate(sector = fct_recode(sector, 
+                             "Industria Alimentaria" = "311",
+                             "Industria de las bebidas y tabaco" = "312",
+                             "Frabicación de insumos de textiles y acabados de textiles" = "313",
+                             "Fabricación de productos textiles excepto prendas de vestir" = "314",
+                             "Fabricación de prendas de vestir" = "315",
+                             "Curtido y acabado de cuero y piel, fabricación de productos de cuero, piel y materiales sucedánios" = "316",
+                             "Industria de la madera" = "321",
+                             "Industria de papel" = "322",
+                             "Impresión e industrias conexas" = "323",
+                             "Fabricación de productos derivados del petroleo y del carbón" = "324",
+                             "Industria quimica" = "325" ,
+                             "Industria del plástico y del hule" = "326",
+                             "Fabricación de productos a base de minerales no metálicos" = "327",
+                             "Industrias metálicas básicas" = "328",
+                             " Fabricación de productos metálicos" = "332",
+                             "Fabricación de maquinaria y equipo" = "333",
+                             "Fabricación de equipo de computación, comunicación, medición y de otros equipos, componentes y accesorios electrónicos" = "334",
+                             "Fabricación de accesorios, aparatos eléctricos y equipo de generación de energía eléctrica" = "335",
+                             "Fabricación de equipo de transporte" = "336",
+                             "Fabricación de muebles, colchones y persianas" = "337",
+                             "Otras industrias manufactureras" = "339", )) %>%
+  ggplot(aes(x = reorder(sector, n), y = n, fill = factor(n))) + 
+  geom_bar(stat = "identity") + 
+  coord_flip() + 
+  ggtitle("Numero de empresas en Industria Manufacturera en Tijuana") + 
+  xlab("") + 
+  ylab("Número de empresas") +
+  theme_minimal() + 
+  theme(legend.position = "none") 
+  
+
+```
+
+## CANTIDAD DE EMPRESAS POR PERSONAL OCUPADO EN COMERCIO AL MAYOREO
+COSAS
+
+
+
+```{r}
+
+db %>%
+  mutate(codigo_act = as.character(codigo_act)) %>%
+  filter(codigo_act %in% c("311","312", "313", "314", "315","316","321", "322", "323", "324","325", "326", "327", "331", "332", "333", "334", "335", "336", "337", "339")) %>%
+  group_by(codigo_act) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x = reorder(codigo_act, n), y = n, fill = factor(n))) + 
+  geom_bar(stat = "identity") + 
+  coord_flip() + 
+  ggtitle("Numero de empresas en comercio al menudeo en Tijuana") + 
+  xlab("") + 
+  ylab("Número de empresas") +
+  theme_minimal() + 
+  theme(legend.position = "none") 
+ 
+
+
+```
+
+
+## CANTIDAD DE EMPRESAS POR PERSONAL OCUPADO EN SECTOR MANUFACTURERO
+
+
+```{r}
+
+db %>%
+  mutate(sector = str_extract(string = codigo_act, pattern = "(\\d\\d)")) %>%
+  filter(sector %in% c("31", "32", "33")) %>%
+  group_by(sector, per_ocu) %>%
+  summarise(emp_tot = n()) %>%
+  ggplot() +
+  geom_bar(aes(x = reorder(per_ocu, emp_tot), y = emp_tot, fill = sector), 
+           stat = "identity", position = "dodge") +
+  coord_flip() +
+  ggtitle("Total empresas por personal la industria manufacturera") + 
+  xlab(label = "") + 
+  ylab(label = "") + 
+  theme_minimal()
+
+
+
+```
+
+
+## CANTIDAD DE EMPRESAS POR PERSONAL OCUPADO EN SECTOR MANUFACTURERO
+
+
+```{r}
+
+db %>%
+  mutate(sector = str_extract(string = codigo_act, pattern = "(\\d\\d)")) %>%
+  filter(sector %in% c("31", "32", "33")) %>%
+  group_by(sector, per_ocu) %>%
+  summarise(emp_tot = n()) %>%
+  ggplot(aes(x = reorder(per_ocu, emp_tot), y = emp_tot, fill = factor(sector))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = emp_tot), size = 3.5, position=position_dodge(width=0.9), vjust=-0.20) +
+  coord_flip() +
+  ggtitle("Total empresas por personal la industria manufacturera") + 
+  xlab(label = "") + 
+  ylab(label = "") + 
+  theme_minimal()
+
+
+
+```
+
+
+# ANALISIS DE CONGLOMERADOS
+
+Convertimos la tabla de datos a un objeto geoespacial
+
+```{r message=FALSE}
+
+map_dta <- db %>%
+  mutate(sector = str_extract(string = codigo_act, pattern = "(\\d\\d)")) 
+
+
+denue_sf <- st_as_sf(map_dta, coords = c("x", "y"), crs = "+proj=longlat +ellps=WGS84 +datum=WGS84")
+
+plot(denue_sf)
+
+```
+
+
+
+```{r}
+
+
+# GET PROJECTION
+
+crs <- st_crs(denue_sf)
+
+tj_map <- openmap(upperLeft = c(32.363723,-117.190132), 
+                  lowerRight = c(32.590503,-116.640816),
+                  type = "osm")
+
+
+# REPROJECT THE MAP ACCORDING TO OUR POLYGONS
+
+map.latlon <- openproj(tj_map, projection = crs$proj4string)
+
+
+```
+
+
+# Crea los clusters
+
+
+
+```{r}
+
+mdist <- st_distance(denue_sf)
+
+
+hc <- hclust(as.dist(mdist), method = "complete")
+
+d = 9000
+
+denue_sf$clust <- cutree(hc, h = d)
+
+
+
+```
+
+
+# PRESENTAMOS ANALISIS DE CLUSTER GEOESPACIAL
+
+
+A;LKSF;LASJDFL;KJAS;LKDFJA;LSKJF
+
+
+```{r fig.width=15, fig.height=9, out.height='100%', out.width='100%'}
+
+
+autoplot.OpenStreetMap(map.latlon) +
+  geom_sf(data = denue_sf, inherit.aes = FALSE, mapping = aes(fill = clust))
+  geom_polygon(data = denue_sf, aes(x = longitud, y = latitud), inherit.aes = FALSE)
+  
+  theme(axis.text.x = element_text(color = "#383838"),
+        axis.text.y = element_text(color = "#383838"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.text = element_text(colour = "#383838"),
+        legend.title = element_text(colour = "#383838"),
+        legend.key = element_rect(colour = NA, fill = NA),
+        legend.key.size = unit(1, "line"),
+        legend.background = element_blank(),
+        panel.grid.major = element_line(color = "#C0C0C0"),
+        plot.title = element_text(vjust= 2.12, 
+                                  colour="#5bb950",
+                                  face="bold"),
+        plot.caption = element_text(color = "#383838"),
+        plot.subtitle = element_text(color = "#f6901e", face = "bold.italic")) + 
+  guides(col = guide_legend(nrow = 16, byrow = TRUE))
+
+
+
+
+```
+
+
+
+# Conclusiones
+
+Aqui van a poner las conclusiones
+
+
+# FUENTES / REFERENCIAS
+
+
+
